@@ -1,0 +1,213 @@
+import React, { useEffect } from 'react';
+import {
+  FlatList,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  BackHandler,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
+import styles from './styles';
+
+const products = [
+  {
+    _id: '0001',
+    title: 'OnePlus 12',
+    description:
+      'The OnePlus 12 offers flagship-level performance powered by the latest Snapdragon chipset, a stunning AMOLED display with ultra-smooth refresh rates, and exceptional battery life.',
+    price: 1100,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/oneplus/oneplus-12-1.jpg',
+        _id: 'img4',
+      },
+    ],
+  },
+  {
+    _id: '0002',
+    title: 'Xiaomi 13 Ultra',
+    description:
+      'The Xiaomi 13 Ultra is a photography powerhouse equipped with Leica-branded cameras and advanced imaging software.',
+    price: 1000,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-13-ultra-1.jpg',
+        _id: 'img5',
+      },
+    ],
+  },
+  {
+    _id: '0003',
+    title: 'Asus ROG Phone 7',
+    description:
+      'Built for gamers, the Asus ROG Phone 7 features an ultra-fast 165Hz display, advanced cooling systems, and customizable RGB lighting. With a powerful processor and game-optimized features, it delivers a premium gaming experience on the go.',
+    price: 1300,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/asus/asus-rog-phone-7-1.jpg',
+        _id: 'img8',
+      },
+    ],
+  },
+  {
+    _id: '0004',
+    title: 'Sony Xperia 1 V',
+    description:
+      'Tailored for creators, the Sony Xperia 1 V boasts a 4K OLED display with cinematic aspect ratio and professional-grade camera features. It’s a superb device for video editing, content creation, and immersive media viewing.',
+    price: 1400,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/sony/sony-xperia-1-v-1.jpg',
+        _id: 'img9',
+      },
+    ],
+  },
+  {
+    _id: '0005',
+    title: 'Nokia XR21',
+    description:
+      'Engineered for durability, the Nokia XR21 is a rugged smartphone built to withstand extreme environments. With military-grade protection, water resistance, and a large battery, it’s perfect for outdoor adventurers and demanding work conditions.',
+    price: 800,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/nokia/nokia-xr21-1.jpg',
+        _id: 'img10',
+      },
+    ],
+  },
+  {
+    _id: '0006',
+    title: 'Realme GT 5 Pro',
+    description:
+      'The Realme GT 5 Pro offers flagship performance at a fraction of the price. With a bright AMOLED display, top-end processor, and rapid charging, it delivers excellent value for users seeking high performance without breaking the bank.',
+    price: 950,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/realme/realme-gt5-pro-1.jpg',
+        _id: 'img11',
+      },
+    ],
+  },
+  {
+    _id: '0007',
+    title: 'Honor Magic6 Pro',
+    description:
+      'The Honor Magic6 Pro stands out with its elegant design, curved display, and powerful hardware. It includes advanced AI features, a stunning camera setup, and fast charging support, making it a luxurious and capable smartphone.',
+    price: 1250,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/honor/honor-magic6-pro-1.jpg',
+        _id: 'img12',
+      },
+    ],
+  },
+  {
+    _id: '0008',
+    title: 'iPhone 15 Pro Max',
+    description:
+      "The iPhone 15 Pro Max features a premium titanium design, A17 Pro chip, and ProMotion display. With its state-of-the-art camera system, spatial video, and long battery life, it's the most advanced iPhone yet for professionals and enthusiasts alike.",
+    price: 1600,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-1.jpg',
+        _id: 'img14',
+      },
+    ],
+  },
+  {
+    _id: '0009',
+    title: 'Motorola Edge 40 Pro',
+    description:
+      'The Motorola Edge 40 Pro offers a sleek design, curved OLED display, and strong performance powered by Snapdragon. With fast wireless charging and near-stock Android experience, it’s a refined flagship option with excellent value.',
+    price: 899,
+    images: [
+      {
+        url: 'https://fdn2.gsmarena.com/vv/pics/motorola/motorola-edge-40-pro-1.jpg',
+        _id: 'img16',
+      },
+    ],
+  },
+];
+
+const navigateToDetails = (
+  navigation: StackNavigationProp<RootStackParamList>,
+  item: {
+    title: string;
+    description: string;
+    price: number;
+    images: {url: string; _id: string}[];
+  },
+) => {
+  navigation.navigate('Details', {
+    title: item.title,
+    description: item.description,
+    price: item.price,
+    imageUrl: item.images[0].url,
+  });
+};
+
+const Home = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Hold on!', 'Are you sure you want to exit?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  const renderProduct = ({item}: {item: (typeof products)[0]}) => {
+    const shortDescription =
+      item.description.length > 100
+        ? `${item.description.substring(0, 100)}...`
+        : item.description;
+
+    return (
+      <TouchableOpacity
+        style={styles.productContainer}
+        onPress={() => navigateToDetails(navigation, item)}>
+        <Image source={{uri: item.images[0].url}} style={styles.productImage} />
+        <View style={styles.productDetails}>
+          <Text style={styles.productTitle}>{item.title}</Text>
+          <Text style={styles.productDescription}>
+            {shortDescription}
+            {item.description.length > 100 && (
+              <Text style={styles.clickForMore}>Click for more</Text>
+            )}
+          </Text>
+          <Text style={styles.productPrice}>${item.price}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View style={styles.viewContainer}>
+      <FlatList
+        data={products}
+        renderItem={renderProduct}
+        keyExtractor={item => item._id}
+        contentContainerStyle={styles.listContainer}
+      />
+    </View>
+  );
+};
+
+export default Home;

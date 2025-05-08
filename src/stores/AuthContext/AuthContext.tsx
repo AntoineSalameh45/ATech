@@ -21,7 +21,14 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([
+    {
+      email: 'eurisko@gmail.com',
+      password: 'academy2025',
+      name: 'Default User',
+      phoneNumber: '0000000000',
+    },
+  ]);
 
   const login = (email: string, password: string): boolean => {
     const user = users.find(u => u.email === email && u.password === password);
@@ -46,7 +53,14 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   };
 
   return (
-    <AuthContext.Provider value={{isAuthenticated, setAuthenticated: setIsAuthenticated, login, logout, register}}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        setAuthenticated: setIsAuthenticated,
+        login,
+        logout,
+        register,
+      }}>
       {children}
     </AuthContext.Provider>
   );

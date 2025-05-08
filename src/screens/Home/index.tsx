@@ -11,7 +11,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import styles from './styles';
+import { getDynamicStyles } from './styles';
+import { useTheme } from '../../stores/ThemeContext';
 
 const products = [
   {
@@ -152,6 +153,8 @@ const navigateToDetails = (
 
 const Home = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { theme } = useTheme();
+  const styles = getDynamicStyles(theme);
   useEffect(() => {
     const backAction = () => {
       Alert.alert('Hold on!', 'Are you sure you want to exit?', [

@@ -2,7 +2,8 @@ import React from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import styles from './styles';
+import { getDynamicStyles } from './styles';
+import { useTheme } from '../../stores/ThemeContext';
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
@@ -12,6 +13,8 @@ type Props = {
 
 const Details = ({route}: Props) => {
   const {title, description, price, imageUrl} = route.params;
+    const { theme } = useTheme();
+    const styles = getDynamicStyles(theme);
 
   return (
     <View style={styles.container}>

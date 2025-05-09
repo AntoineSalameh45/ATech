@@ -8,11 +8,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 32,
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
+    fontFamily: 'Rancho-Regular',
   },
   description: {
     fontSize: 12,

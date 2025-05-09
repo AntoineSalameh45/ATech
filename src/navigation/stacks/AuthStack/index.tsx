@@ -2,25 +2,10 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../RootStackParamList';
 import Home from '../../../screens/Home';
 import Details from '../../../screens/Details';
-import {Button} from 'react-native';
 import {useTheme} from '../../../stores/ThemeContext';
+import {HeaderRight} from '../../../components/atoms/HeaderRight';
 
 const MainStack = createNativeStackNavigator<RootStackParamList>();
-
-function HeaderRight({
-  theme,
-  toggleTheme,
-}: {
-  theme: string;
-  toggleTheme: () => void;
-}) {
-  return (
-    <Button
-      onPress={toggleTheme}
-      title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-    />
-  );
-}
 
 function AuthStack() {
   const {theme, toggleTheme} = useTheme();
@@ -36,6 +21,11 @@ function AuthStack() {
           backgroundColor: theme === 'light' ? '#ffffff' : '#333333',
         },
         headerTintColor: theme === 'light' ? '#000000' : '#ffffff',
+        headerTitleStyle: {
+          fontFamily: 'Rancho-Regular',
+          fontSize: 28,
+          color: theme === 'light' ? '#000000' : '#ffffff',
+        },
       }}>
       <MainStack.Screen
         name="Home"

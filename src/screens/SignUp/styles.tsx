@@ -11,14 +11,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#333',
+    fontFamily: 'Rancho-Regular',
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
     color: '#333',
+    fontFamily: 'Rancho-Regular',
   },
   input: {
     borderWidth: 1,

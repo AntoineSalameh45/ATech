@@ -1,18 +1,10 @@
-import React, { useEffect } from 'react';
-import {
-  FlatList,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  Alert,
-  BackHandler,
-} from 'react-native';
+import React from 'react';
+import {FlatList, Text, View, Image, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import { getDynamicStyles } from './styles';
-import { useTheme } from '../../stores/ThemeContext';
+import {getDynamicStyles} from './styles';
+import {useTheme} from '../../stores/ThemeContext';
 
 const products = [
   {
@@ -153,28 +145,28 @@ const navigateToDetails = (
 
 const Home = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
-  useEffect(() => {
-    const backAction = () => {
-      Alert.alert('Hold on!', 'Are you sure you want to exit?', [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {text: 'YES', onPress: () => BackHandler.exitApp()},
-      ]);
-      return true;
-    };
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     Alert.alert('Hold on!', 'Are you sure you want to exit?', [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => null,
+  //         style: 'cancel',
+  //       },
+  //       {text: 'YES', onPress: () => BackHandler.exitApp()},
+  //     ]);
+  //     return true;
+  //   };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction,
+  //   );
 
-    return () => backHandler.remove();
-  }, []);
+  //   return () => backHandler.remove();
+  // }, []);
 
   const renderProduct = ({item}: {item: (typeof products)[0]}) => {
     const shortDescription =

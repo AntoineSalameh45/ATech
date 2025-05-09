@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '../../stores/AuthContext';
+import {View, Text, TextInput, Alert, TouchableOpacity} from 'react-native';
+import {useForm, Controller} from 'react-hook-form';
+import {z} from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useAuth} from '../../stores/AuthContext';
 import styles from './styles';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 
 // Zod Validation Schema
 const schema = z.object({
@@ -22,11 +22,11 @@ type LoginFormInputs = z.infer<typeof schema>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { login } = useAuth();
+  const {login} = useAuth();
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(schema),
   });
@@ -51,11 +51,12 @@ const LoginScreen = () => {
       <Controller
         control={control}
         name="email"
-        render={({ field: { onChange, onBlur, value } }) => (
+        render={({field: {onChange, onBlur, value}}) => (
           <View>
             <TextInput
               style={[styles.input, errors.email && styles.errorInput]}
-              placeholder="Email"
+              placeholder="example@example.com"
+              placeholderTextColor="#888888"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -71,11 +72,12 @@ const LoginScreen = () => {
       <Controller
         control={control}
         name="password"
-        render={({ field: { onChange, onBlur, value } }) => (
+        render={({field: {onChange, onBlur, value}}) => (
           <View>
             <TextInput
               style={[styles.input, errors.password && styles.errorInput]}
               placeholder="Password"
+              placeholderTextColor="#888888"
               secureTextEntry
               onBlur={onBlur}
               onChangeText={onChange}
@@ -90,8 +92,7 @@ const LoginScreen = () => {
 
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={handleSubmit(onSubmit)}
-      >
+        onPress={handleSubmit(onSubmit)}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
 
@@ -100,8 +101,7 @@ const LoginScreen = () => {
           Don't have an account?{' '}
           <Text
             style={styles.signupLink}
-            onPress={() => navigation.navigate('SignUp')}
-          >
+            onPress={() => navigation.navigate('SignUp')}>
             Sign Up
           </Text>
         </Text>

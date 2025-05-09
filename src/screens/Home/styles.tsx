@@ -1,61 +1,86 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const BASE_WIDTH = 375;
+
+const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
 
 export const getDynamicStyles = (theme: 'light' | 'dark') => {
   const isLight = theme === 'light';
+  const primaryColor = isLight ? '#007BFF' : '#FF4500';
+  const glowColor = isLight ? '#87CEEB' : '#FF6347';
 
   return StyleSheet.create({
     viewContainer: {
       flex: 1,
-      padding: 16,
-      backgroundColor: isLight ? '#ffffff' : '#222222',
+      padding: scale(16),
+      backgroundColor: isLight ? '#F0F8FF' : '#1C1C1E',
     },
     text: {
-      fontSize: 18,
+      fontSize: scale(18),
       fontWeight: 'bold',
-      marginBottom: 16,
-      color: isLight ? '#000000' : '#ffffff',
+      marginBottom: scale(16),
+      color: isLight ? '#000' : '#fff',
     },
     listContainer: {
-      paddingVertical: 8,
+      paddingVertical: scale(8),
     },
     productContainer: {
       flexDirection: 'row',
-      marginBottom: 16,
-      backgroundColor: isLight ? '#f9f9f9' : '#444444',
-      borderRadius: 8,
-      padding: 8,
-      shadowColor: isLight ? '#000' : '#fff',
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      marginBottom: scale(16),
+      backgroundColor: isLight ? '#F9FAFB' : '#2D2D2D',
+      borderRadius: scale(8),
+      padding: scale(12),
+      shadowColor: glowColor,
+      shadowOpacity: 0.5,
+      shadowRadius: scale(8),
+      elevation: 5,
     },
     productImage: {
-      width: 100,
-      height: 100,
-      borderRadius: 8,
-      marginRight: 8,
+      width: scale(100),
+      height: scale(100),
+      borderRadius: scale(8),
+      marginRight: scale(8),
+      borderWidth: PixelRatio.getPixelSizeForLayoutSize(0.5),
+      borderColor: isLight ? primaryColor : '#FF6347',
     },
     productDetails: {
       flex: 1,
     },
     productTitle: {
-      fontSize: 16,
+      fontSize: scale(16),
       fontWeight: 'bold',
-      marginBottom: 4,
-      color: isLight ? '#000000' : '#ffffff',
+      marginBottom: scale(4),
+      color: isLight ? '#000' : '#fff',
     },
     productDescription: {
-      fontSize: 14,
-      color: isLight ? '#555' : '#cccccc',
-      marginBottom: 8,
+      fontSize: scale(14),
+      color: isLight ? '#555' : '#ccc',
+      marginBottom: scale(8),
+      fontFamily: 'Rancho-Regular',
     },
     productPrice: {
-      fontSize: 16,
+      fontSize: scale(16),
       fontWeight: 'bold',
-      color: isLight ? '#007BFF' : '#77AAFF',
+      color: primaryColor,
     },
     clickForMore: {
-      color: isLight ? '#007BFF' : '#77AAFF',
+      color: primaryColor,
+      fontWeight: 'bold',
+    },
+    button: {
+      backgroundColor: primaryColor,
+      paddingVertical: scale(10),
+      paddingHorizontal: scale(20),
+      borderRadius: scale(20),
+      shadowColor: glowColor,
+      shadowOpacity: 0.7,
+      shadowRadius: scale(15),
+      elevation: 8,
+    },
+    buttonText: {
+      fontSize: scale(16),
+      color: '#fff',
       fontWeight: 'bold',
     },
   });

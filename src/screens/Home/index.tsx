@@ -1,10 +1,11 @@
 import React from 'react';
-import {FlatList, Text, View, Image, TouchableOpacity} from 'react-native';
+import {View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
+import ProductList from '../../components/organisims/ProductList/ProductList';
 
 const products = [
   {
@@ -132,7 +133,7 @@ const navigateToDetails = (
     title: string;
     description: string;
     price: number;
-    images: {url: string; _id: string}[];
+    images: {url: string}[];
   },
 ) => {
   navigation.navigate('Details', {
@@ -143,66 +144,20 @@ const navigateToDetails = (
   });
 };
 
-const Home = () => {
+const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     Alert.alert('Hold on!', 'Are you sure you want to exit?', [
-  //       {
-  //         text: 'Cancel',
-  //         onPress: () => null,
-  //         style: 'cancel',
-  //       },
-  //       {text: 'YES', onPress: () => BackHandler.exitApp()},
-  //     ]);
-  //     return true;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction,
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, []);
-
-  const renderProduct = ({item}: {item: (typeof products)[0]}) => {
-    const shortDescription =
-      item.description.length > 100
-        ? `${item.description.substring(0, 100)}...`
-        : item.description;
-
-    return (
-      <TouchableOpacity
-        style={styles.productContainer}
-        onPress={() => navigateToDetails(navigation, item)}>
-        <Image source={{uri: item.images[0].url}} style={styles.productImage} />
-        <View style={styles.productDetails}>
-          <Text style={styles.productTitle}>{item.title}</Text>
-          <Text style={styles.productDescription}>
-            {shortDescription}
-            {item.description.length > 100 && (
-              <Text style={styles.clickForMore}>Click for more</Text>
-            )}
-          </Text>
-          <Text style={styles.productPrice}>${item.price}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   return (
     <View style={styles.viewContainer}>
-      <FlatList
-        data={products}
-        renderItem={renderProduct}
-        keyExtractor={item => item._id}
-        contentContainerStyle={styles.listContainer}
+      <ProductList
+        products={products}
+        onProductPress={item => navigateToDetails(navigation, item)}
+        styles={styles}
       />
     </View>
   );
 };
 
-export default Home;
+export default HomeScreen;

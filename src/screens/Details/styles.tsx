@@ -1,6 +1,6 @@
-import { StyleSheet, Dimensions, PixelRatio } from 'react-native';
+import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
 
 const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
@@ -21,7 +21,7 @@ export const getDynamicStyles = (theme: string) => {
       height: scale(250),
       borderRadius: scale(10),
       marginBottom: scale(20),
-      borderWidth: PixelRatio.getPixelSizeForLayoutSize(1.5), // Adjusted for high-DPI screens
+      borderWidth: PixelRatio.getPixelSizeForLayoutSize(1.5),
       borderColor: saberGlow,
       shadowColor: saberGlow,
       shadowOpacity: 0.8,
@@ -34,7 +34,7 @@ export const getDynamicStyles = (theme: string) => {
       marginBottom: scale(10),
       color: isDark ? '#ffffff' : '#000000',
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
     },
     description: {
@@ -44,36 +44,78 @@ export const getDynamicStyles = (theme: string) => {
       color: isDark ? '#e0e0e0' : '#333333',
       fontFamily: 'Rancho-Regular',
     },
+    priceContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: scale(20),
+      backgroundColor: isDark ? '#1c1c1c' : '#1c1c1c22',
+      padding: scale(10),
+      borderRadius: scale(10),
+      borderWidth: 1,
+      borderColor: isDark ? '#444' : '#ddd',
+      shadowColor: isDark ? '#000' : '#aaa',
+      shadowOpacity: 0.2,
+      shadowRadius: scale(5),
+    },
+    priceLabel: {
+      fontSize: scale(16),
+      color: isDark ? '#ffffff' : '#000000',
+    },
     price: {
       fontSize: scale(20),
       fontWeight: 'bold',
       color: primaryColor,
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(4),
     },
     buttonContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       marginTop: scale(20),
     },
     button: {
-      backgroundColor: primaryColor,
-      paddingVertical: scale(15),
-      paddingHorizontal: scale(20),
-      borderRadius: scale(8),
+      backgroundColor: isDark ? '#D32F2F' : '#0288D1',
+      width: '80%',
+      height: scale(50),
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: scale(12),
       shadowColor: saberGlow,
-      shadowOpacity: 0.8,
-      shadowRadius: scale(10),
+      shadowOpacity: 0.9,
+      shadowRadius: scale(15),
       elevation: 10,
     },
     buttonText: {
-      color: isDark ? '#000000' : '#ffffff',
-      fontSize: scale(16),
+      color: isDark ? '#F5F5F5' : '#E3F2FD',
+      fontSize: scale(18),
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
-      textShadowRadius: scale(4),
+      textShadowOffset: {width: 0, height: 0},
+      textShadowRadius: scale(6),
       fontFamily: 'Rancho-Regular',
+      textAlign: 'center',
+    },
+    shareButton: {
+      backgroundColor: isDark ? '#e0e0e022' : '#1c1c1c22',
+      width: '20%',
+      height: scale(50),
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: scale(12),
+      shadowColor: isDark ? '#FF8A65' : '#81D4FA',
+      shadowOpacity: 0.8,
+      shadowRadius: scale(10),
+      marginLeft: scale(10),
+    },
+    shareButtonText: {
+      color: isDark ? '#FF5722' : '#03A9F4',
+      fontSize: scale(16),
+      fontWeight: 'bold',
+      textShadowColor: isDark ? '#FF8A65' : '#81D4FA',
+      textShadowOffset: {width: 0, height: 0},
+      textShadowRadius: scale(6),
     },
   });
 };

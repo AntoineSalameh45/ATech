@@ -1,24 +1,13 @@
 import React from 'react';
 import {View, Text, TextInput, Alert, TouchableOpacity} from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
-import {z} from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../stores/AuthContext';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-
-// Zod Validation Schema
-const schema = z.object({
-  email: z.string().email('Invalid email format').nonempty('Email is required'),
-  password: z
-    .string()
-    .min(6, 'Password must be at least 6 characters')
-    .nonempty('Password is required'),
-});
-
-type LoginFormInputs = z.infer<typeof schema>;
+import {loginSchema, LoginFormInputs} from '../../utils/validation/useLoginForm';
 
 const LoginScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -28,7 +17,7 @@ const LoginScreen = () => {
     handleSubmit,
     formState: {errors},
   } = useForm<LoginFormInputs>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = (data: LoginFormInputs) => {

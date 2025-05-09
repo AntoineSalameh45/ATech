@@ -1,15 +1,9 @@
 import React from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
-import AuthStack from './src/navigation/stacks/AuthStack';
-import UnauthStack from './src/navigation/stacks/UnauthStack';
-import {AuthProvider, useAuth} from './src/stores/AuthContext';
+import {AuthProvider} from './src/stores/AuthContext';
 import {ThemeProvider} from './src/stores/ThemeContext';
-
-const RootNavigator = () => {
-  const {isAuthenticated} = useAuth();
-  return isAuthenticated ? <AuthStack /> : <UnauthStack />;
-};
+import RootStack from './src/navigation/RootStack';
 
 const App = () => {
   return (
@@ -17,7 +11,7 @@ const App = () => {
       <ThemeProvider>
         <SafeAreaProvider>
           <NavigationContainer>
-            <RootNavigator />
+            <RootStack />
           </NavigationContainer>
         </SafeAreaProvider>
       </ThemeProvider>

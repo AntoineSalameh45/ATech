@@ -1,11 +1,12 @@
 import React from 'react';
-import {View} from 'react-native';
+import {KeyboardAvoidingView, Platform} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
+import { SearchBar } from '../../components/molecules/Searchbar';
 
 const products = [
   {
@@ -150,13 +151,16 @@ const HomeScreen = () => {
   const styles = getDynamicStyles(theme);
 
   return (
-    <View style={styles.viewContainer}>
+    <KeyboardAvoidingView
+      style={styles.viewContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <SearchBar />
       <ProductList
         products={products}
         onProductPress={item => navigateToDetails(navigation, item)}
         styles={styles}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -1,14 +1,38 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ATech
 
-# Getting Started
+ATech is a React Native application designed to provide a seamless shopping experience for tech enthusiasts. The app features user authentication, a dynamic theme switcher, and a curated list of tech products with detailed descriptions.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- **User Authentication**: Sign up, log in, and manage user sessions with [`AuthContext`](src/stores/AuthContext/AuthContext.tsx).
+- **Dynamic Theming**: Switch between light and dark themes using [`ThemeContext`](src/stores/ThemeContext/ThemeContext.tsx).
+- **Product Listings**: Browse a list of tech products with detailed descriptions and images.
+- **Navigation**: Navigate between screens using React Navigation.
+- **Responsive Design**: Optimized for both Android and iOS devices.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Getting Started
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+> **Note**: Ensure your development environment is set up as per the [React Native Environment Setup Guide](https://reactnative.dev/docs/environment-setup).
+
+### Step 1: Install Dependencies
+
+Install the required dependencies for the project:
+
+```sh
+# Install Node.js dependencies
+npm install
+
+# OR using Yarn
+yarn install
+
+# Install iOS dependencies (only for macOS users)
+bundle install
+bundle exec pod install --project-directory=ios
+```
+
+### Step 2: Start Metro
+
+Start the Metro bundler, the JavaScript build tool for React Native:
 
 ```sh
 # Using npm
@@ -18,11 +42,9 @@ npm start
 yarn start
 ```
 
-## Step 2: Build and run your app
+### Step 3: Run the App
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+#### Android
 
 ```sh
 # Using npm
@@ -32,23 +54,7 @@ npm run android
 yarn android
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+#### iOS
 
 ```sh
 # Using npm
@@ -58,40 +64,28 @@ npm run ios
 yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Fonts
 
-## Step 3: Modify your app
+The app uses custom fonts:
 
-Now that you have successfully run the app, let's make changes!
+- **Rancho**: [Rancho-Regular.ttf](src/assets/fonts/Rancho-Regular.ttf)
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+The fonts are linked in the project via [`react-native.config.js`](react-native.config.js).
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Troubleshooting
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+If you encounter issues, refer to the [React Native Troubleshooting Guide](https://reactnative.dev/docs/troubleshooting).
 
-## Congratulations! :tada:
+## Learn More
 
-You've successfully run and modified your React Native App. :partying_face:
+To learn more about React Native, check out the following resources:
 
-### Now what?
+- [React Native Documentation](https://reactnative.dev/docs/getting-started)
+- [React Navigation](https://reactnavigation.org/docs/getting-started)
+- [Zod Validation](https://zod.dev/)
+- [React Hook Form](https://react-hook-form.com/)
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## License
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+This project is licensed under the MIT License.

@@ -1,8 +1,11 @@
 import React from 'react';
 import {View, TextInput} from 'react-native';
-import styles from './styles';
+import { useTheme } from '../../../stores/ThemeContext';
+import getStyles from './styles';
 
 const SearchBar = () => {
+  const {theme} = useTheme();
+  const styles = getStyles(theme);
   return (
     <View style={styles.container}>
       <TextInput

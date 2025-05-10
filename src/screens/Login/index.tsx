@@ -105,7 +105,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
 
           <View style={styles.signupTextContainer}>
-            <Text style={styles.description}>
+            <Text style={styles.signupText}>
               Don't have an account?{' '}
               <Text
                 style={styles.signupLink}

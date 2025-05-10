@@ -55,6 +55,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  loginTextContainer: {
+    marginTop: 20,
+  },
+  loginText: {
+    fontSize: 12,
+    color: '#333',
+    textAlign: 'center',
+  },
+  loginLink: {
+    color: '#007BFF',
+  },
 });
 
 export default styles;

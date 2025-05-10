@@ -152,6 +152,17 @@ const SignUp = () => {
               onPress={handleSubmit(onSubmit)}>
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
+
+            <View style={styles.loginTextContainer}>
+              <Text style={styles.loginText}>
+                Already have an account?{' '}
+                <Text
+                  style={styles.loginLink}
+                  onPress={() => navigation.navigate('Login')}>
+                  Login
+                </Text>
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signupText: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#333',
     textAlign: 'center',
   },

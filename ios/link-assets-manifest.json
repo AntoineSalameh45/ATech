@@ -8,6 +8,14 @@
     {
       "path": "src/assets/fonts/Rancho-Regular.ttf",
       "sha1": "7aaa99b3b58577825519fecdcdfac04fee51a5fb"
+    },
+    {
+      "path": "src/assets/fonts/Starjedi.ttf",
+      "sha1": "d63c0c8eb5df9b1c3b672c644898bc17d3544902"
+    },
+    {
+      "path": "src/assets/fonts/Starjhol.ttf",
+      "sha1": "78c1b5f071e445c3dda1f6ccc125e443f4b9fe4e"
     }
   ]
 }

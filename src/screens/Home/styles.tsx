@@ -1,4 +1,5 @@
 import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
+import { globalStyles } from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -49,19 +50,19 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
     },
     productTitle: {
       fontSize: scale(16),
-      fontWeight: 'bold',
       marginBottom: scale(4),
       color: isLight ? '#000' : '#fff',
+      fontFamily: globalStyles.title_font,
     },
     productDescription: {
       fontSize: scale(14),
       color: isLight ? '#555' : '#ccc',
       marginBottom: scale(8),
-      fontFamily: 'Rancho-Regular',
+      fontFamily: globalStyles.primary_font,
     },
     productPrice: {
       fontSize: scale(16),
-      fontWeight: 'bold',
+      fontFamily: globalStyles.price_tag,
       color: primaryColor,
     },
     clickForMore: {

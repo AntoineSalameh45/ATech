@@ -153,11 +153,11 @@ const SignUp = () => {
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
-            <View style={styles.loginTextContainer}>
-              <Text style={styles.loginText}>
+            <View style={styles.signupTextContainer}>
+              <Text style={styles.signupText}>
                 Already have an account?{' '}
                 <Text
-                  style={styles.loginLink}
+                  style={styles.signupLink}
                   onPress={() => navigation.navigate('Login')}>
                   Login
                 </Text>

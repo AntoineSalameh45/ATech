@@ -1,4 +1,5 @@
 import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
+import {globalStyles} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -30,7 +31,7 @@ export const getDynamicStyles = (theme: string) => {
     },
     title: {
       fontSize: scale(26),
-      fontWeight: 'bold',
+      fontFamily: globalStyles.title_font,
       marginBottom: scale(10),
       color: isDark ? '#ffffff' : '#000000',
       textShadowColor: saberGlow,
@@ -60,11 +61,12 @@ export const getDynamicStyles = (theme: string) => {
     },
     priceLabel: {
       fontSize: scale(16),
+      fontFamily: globalStyles.price_tag,
       color: isDark ? '#ffffff' : '#000000',
     },
     price: {
       fontSize: scale(20),
-      fontWeight: 'bold',
+      fontFamily: globalStyles.price_tag,
       color: primaryColor,
       textShadowColor: saberGlow,
       textShadowOffset: {width: 0, height: 0},

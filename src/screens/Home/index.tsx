@@ -6,7 +6,7 @@ import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
-import { SearchBar } from '../../components/molecules/Searchbar';
+import {SearchBar} from '../../components/molecules/Searchbar';
 
 const products = [
   {
@@ -153,7 +153,8 @@ const HomeScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.viewContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
       <SearchBar />
       <ProductList
         products={products}

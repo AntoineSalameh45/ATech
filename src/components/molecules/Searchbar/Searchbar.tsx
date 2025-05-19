@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, TextInput} from 'react-native';
-import { useTheme } from '../../../stores/ThemeContext';
+import {TextInput, View} from 'react-native';
+import {useTheme} from '../../../stores/ThemeContext';
 import getStyles from './styles';
 
 const SearchBar = () => {

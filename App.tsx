@@ -10,9 +10,9 @@ const App = () => {
     <AuthProvider>
       <ThemeProvider>
         <SafeAreaProvider>
-          <NavigationContainer>
-            <RootStack />
-          </NavigationContainer>
+            <NavigationContainer>
+              <RootStack />
+            </NavigationContainer>
         </SafeAreaProvider>
       </ThemeProvider>
     </AuthProvider>

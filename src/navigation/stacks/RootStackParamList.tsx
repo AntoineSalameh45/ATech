@@ -3,6 +3,7 @@ export type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
     OTP: { email: string };
+    Camera: undefined;
     Details: {
       title: string;
       description: string;

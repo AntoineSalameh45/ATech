@@ -6,6 +6,7 @@ import {useTheme} from '../../../stores/ThemeContext';
 import {HeaderRight} from '../../../components/atoms/HeaderRight';
 import styles from '../../../components/atoms/HeaderRight/styles';
 import { View } from 'react-native';
+import CameraTest from '../../../screens/CameraTest';
 
 const MainStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -49,6 +50,11 @@ function AuthStack() {
             color: theme === 'light' ? '#000000' : '#ffffff',
           },
         })}
+      />
+      <MainStack.Screen
+        name="Camera"
+        component={CameraTest}
+        options={{headerShown: false}}
       />
     </MainStack.Navigator>
   );

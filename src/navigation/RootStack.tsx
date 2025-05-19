@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAuth } from '../stores/AuthContext';
-import AuthStack from './stacks/AuthStack';
 import UnauthStack from './stacks/UnauthStack';
+import MainNavigator from './navigators/MainNavigator';
 
 const RootStack = () => {
   const {isAuthenticated} = useAuth();
-  return isAuthenticated ? <AuthStack /> : <UnauthStack />;
+  return isAuthenticated ? <MainNavigator /> : <UnauthStack />;
 };
 
 export default RootStack;

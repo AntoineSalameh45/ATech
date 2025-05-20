@@ -1,7 +1,7 @@
-import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {useTheme} from '../../../stores/ThemeContext';
-import {getDynamicStyles} from './styles';
+import React, { useEffect, useState } from 'react';
+import { TouchableOpacity, View, Keyboard } from 'react-native';
+import { useTheme } from '../../../stores/ThemeContext';
+import { getDynamicStyles } from './styles';
 
 interface TabBarProps {
   state: any;
@@ -10,9 +10,29 @@ interface TabBarProps {
   icons: any;
 }
 
-const MyTabBar = ({state, navigation, icons}: TabBarProps) => {
-  const {theme} = useTheme();
+const MyTabBar = ({ state, navigation, icons }: TabBarProps) => {
+  const { theme } = useTheme();
   const styles = getDynamicStyles(theme);
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  if (isKeyboardVisible) {
+    return null; // Hide the tab bar when the keyboard is visible
+  }
 
   return (
     <View style={styles.tabBar}>
@@ -53,10 +73,11 @@ const MyTabBar = ({state, navigation, icons}: TabBarProps) => {
             <TouchableOpacity
               key={route.key}
               accessibilityRole="button"
-              accessibilityState={isFocused ? {selected: true} : {}}
+              accessibilityState={isFocused ? { selected: true } : {}}
               onPress={onPress}
               onLongPress={onLongPress}
-              style={buttonStyle}>
+              style={buttonStyle}
+            >
               <Icon width={24} height={24} />
             </TouchableOpacity>
           );

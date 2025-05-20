@@ -10,4 +10,7 @@ export type RootStackParamList = {
       price: number;
       imageUrl: string;
     };
+    Profile: {
+      name: string;
+    };
   };

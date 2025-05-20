@@ -6,6 +6,9 @@ import {
   StyleSheet,
   Pressable,
   Image,
+  Alert,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
@@ -13,33 +16,80 @@ import {
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
-
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faCameraRotate} from '@fortawesome/free-solid-svg-icons';
-import {faCircleXmark} from '@fortawesome/free-solid-svg-icons';
-import {faCamera} from '@fortawesome/free-solid-svg-icons';
-import {FlashIcon, FlashOffIcon} from '../../assets/svg';
+import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+import {
+  CameraIcon,
+  CameraFlipIcon,
+  CloseCircleIcon,
+  FlashIcon,
+  FlashOffIcon,
+  RetakeIcon,
+  SaveIcon,
+} from '../../assets/svg';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
 
-library.add(faCamera, faCameraRotate, faCircleXmark);
+const hasAndroidPermission = async () => {
+  if (Platform.OS !== 'android') {return true;}
+
+  if (Platform.Version >= 33) {
+    const statuses = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+      PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+    ]);
+    return (
+      statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
+        PermissionsAndroid.RESULTS.GRANTED &&
+      statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ===
+        PermissionsAndroid.RESULTS.GRANTED
+    );
+  } else {
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    );
+    return status === PermissionsAndroid.RESULTS.GRANTED;
+  }
+};
+
+const saveToGallery = async (
+  uri: string,
+  setImageUri: React.Dispatch<React.SetStateAction<string>>,
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  try {
+    if (Platform.OS === 'android' && !(await hasAndroidPermission())) {
+      Alert.alert(
+        'Permission Denied',
+        'Cannot save the photo without the required permissions.',
+      );
+      return;
+    }
+
+    const asset = await CameraRoll.save(uri, {
+      type: 'photo',
+      album: 'Captured Photos',
+    });
+
+    console.log('Saved Asset:', asset);
+    Alert.alert('Photo Saved', 'Your photo has been saved successfully.');
+    setImageUri('');
+    setIsOpen(false);
+  } catch (error) {
+    console.error('Error saving photo:', error);
+    Alert.alert('Error', 'Failed to save the photo. Please try again.');
+  }
+};
+
 
 const CameraTest = () => {
   const {hasPermission, requestPermission} = useCameraPermission();
-
   const [cameraDevice, setCameraDevice] = useState<'back' | 'front'>('back');
   const device = useCameraDevice(cameraDevice);
   const camera = useRef<Camera>(null);
-
   const [isOpen, setIsOpen] = useState(false);
-  const closeCamera = () => setIsOpen(false);
-  const toggleCameraDevice = () => {
-    const newDevice = cameraDevice === 'back' ? 'front' : 'back';
-    setCameraDevice(newDevice);
-  };
-
   const [imageUri, setImageUri] = useState('');
+  const {theme} = useTheme();
+  const styles = getDynamicStyles(theme);
 
   const handleCameraPermissions = useCallback(async () => {
     const result = await requestPermission();
@@ -50,31 +100,37 @@ const CameraTest = () => {
     handleCameraPermissions();
   }, [handleCameraPermissions]);
 
+  const handleOnPress = async () => {
+    try {
+      const photo = await camera?.current?.takePhoto({flash: flashMode});
+      const uri = `file://${photo?.path}`;
+      setImageUri(uri);
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+      Alert.alert('Error', 'Failed to capture the photo.');
+    }
+  };
+
   const openSettings = async () => {
     await Linking.openSettings();
   };
-  const [flashMode, setFlashMode] = useState<'on' | 'off'>('off');
-  const [flashHintVisible, setFlashHintVisible] = useState(false);
 
+  const [flashMode, setFlashMode] = useState<'on' | 'off'>('off');
   const toggleFlash = () => {
     setFlashMode(prev => (prev === 'off' ? 'on' : 'off'));
-    setFlashHintVisible(true);
-
-    setTimeout(() => {
-      setFlashHintVisible(false);
-    }, 2000);
   };
 
-  const handleOnpress = async () => {
-    const photo = await camera?.current?.takePhoto({flash: flashMode});
-    setImageUri(`file://${photo?.path}`);
-    setIsOpen(false);
-
-    console.log(photo);
+  const toggleCameraDevice = () => {
+    setCameraDevice(prev => (prev === 'back' ? 'front' : 'back'));
   };
 
-  const {theme} = useTheme();
-  const styles = getDynamicStyles(theme);
+  const closeCamera = () => setIsOpen(false);
+
+  const handleRetake = () => {
+    setImageUri('');
+    setIsOpen(true);
+  };
 
   if (!hasPermission) {
     return (
@@ -90,18 +146,26 @@ const CameraTest = () => {
   return (
     <SafeAreaView style={styles.viewContainer}>
       {!!imageUri && (
-        <Image source={{uri: imageUri}} style={styles.imageContainer} />
+        <View style={StyleSheet.absoluteFill}>
+          <Image source={{uri: imageUri}} style={styles.imageContainer} />
+          <View style={styles.postPhotoButtonContainer}>
+            <Pressable
+              onPress={() => saveToGallery(imageUri, setImageUri, setIsOpen)}
+              style={styles.saveButton}>
+              <SaveIcon height={26} width={26} />
+            </Pressable>
+            <Pressable onPress={handleRetake} style={styles.saveButton}>
+              <RetakeIcon height={26} width={26} />
+            </Pressable>
+          </View>
+        </View>
       )}
-      {!isOpen && (
+      {!isOpen && !imageUri && (
         <View style={styles.cameraOpenButtonContainer}>
           <Pressable
             onPress={() => setIsOpen(true)}
             style={styles.cameraOpenButton}>
-            <FontAwesomeIcon
-              icon={faCamera}
-              size={32}
-              color={theme === 'light' ? '#050505dd' : '#fefefedd'}
-            />
+            <CameraIcon height={32} width={32} />
           </Pressable>
         </View>
       )}
@@ -115,42 +179,22 @@ const CameraTest = () => {
             photo
           />
           <View style={styles.buttonContainer}>
-            <View style={styles.flashContainer}>
-              <Pressable onPress={toggleFlash} style={styles.cameraButtons}>
-                {flashMode === 'on' ? (
-                  <FlashIcon height={26} width={26} />
-                ) : (
-                  <FlashOffIcon height={26} width={26} />
-                )}
-              </Pressable>
-              {flashHintVisible && (
-                <View style={styles.flashHintContainer}>
-                  <Text style={styles.flashHintText}>
-                    {flashMode === 'on' ? 'Flash is On' : 'Flash is Off'}
-                  </Text>
-                </View>
+            <Pressable onPress={toggleFlash} style={styles.cameraButtons}>
+              {flashMode === 'on' ? (
+                <FlashIcon height={26} width={26} />
+              ) : (
+                <FlashOffIcon height={26} width={26} />
               )}
-            </View>
-
+            </Pressable>
             <Pressable onPress={closeCamera} style={styles.cameraButtons}>
-              <FontAwesomeIcon
-                icon={faCircleXmark}
-                style={styles.buttonStyle}
-                size={32}
-              />
+              <CloseCircleIcon height={32} width={32} />
             </Pressable>
           </View>
-
           <View style={styles.shutterContainer}>
-            <Pressable onPress={handleOnpress} style={styles.shutterButton} />
+            <Pressable onPress={handleOnPress} style={styles.shutterButton} />
           </View>
-
           <Pressable onPress={toggleCameraDevice} style={styles.camFlipButton}>
-            <FontAwesomeIcon
-              icon={faCameraRotate}
-              style={styles.buttonStyle}
-              size={32}
-            />
+            <CameraFlipIcon height={32} width={32} />
           </Pressable>
         </View>
       )}

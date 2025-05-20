@@ -2,13 +2,13 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CameraTest from '../../../screens/CameraTest';
 import AuthStack from '../../stacks/AuthStack';
-import ProfileScreen from '../../../screens/Profile';
 import MyTabBar from '../../../components/organisims/CustomTabBar';
 import { HomeIcon, AddIcon, CartIcon, ProfileIcon } from '../../../assets/svg';
 import { View } from 'react-native';
 import styles from '../../../components/atoms/HeaderRight/styles';
 import { iThemeContextType, useTheme } from '../../../stores/ThemeContext';
 import { HeaderRight } from '../../../components/atoms/HeaderRight';
+import ProfileStack from '../../stacks/ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -49,16 +49,14 @@ function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Camera"
+        name="CameraTest"
         component={CameraTest}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: '',
-        }}
+        component={ProfileStack}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );

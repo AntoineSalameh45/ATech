@@ -55,6 +55,7 @@ function AuthStack() {
         name="Camera"
         component={CameraTest}
         options={{headerShown: false}}
+        initialParams={{ onPhotoTaken: () => {} }}
       />
     </MainStack.Navigator>
   );

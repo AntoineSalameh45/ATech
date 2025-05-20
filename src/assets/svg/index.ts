@@ -1,6 +1,11 @@
-export { default as HomeIcon } from './HomeSvg.svg';
-export { default as CartIcon } from './CartSvg.svg';
-export { default as ProfileIcon } from './ProfileSvg.svg';
-export { default as FlashIcon } from './FlashSvg.svg';
-export { default as FlashOffIcon } from './FlashOffSvg.svg';
-export { default as AddIcon } from './AddSvg.svg';
+export {default as HomeIcon} from './HomeSvg.svg';
+export {default as CartIcon} from './CartSvg.svg';
+export {default as ProfileIcon} from './ProfileSvg.svg';
+export {default as FlashIcon} from './FlashSvg.svg';
+export {default as FlashOffIcon} from './FlashOffSvg.svg';
+export {default as AddIcon} from './AddSvg.svg';
+export {default as SaveIcon} from './SaveSvg.svg';
+export {default as CameraIcon} from './CamerSvg.svg';
+export {default as CameraFlipIcon} from './CameraFlipSvg.svg';
+export {default as RetakeIcon} from './RetakeSvg.svg';
+export {default as CloseCircleIcon} from './CloseCircleSvg.svg';

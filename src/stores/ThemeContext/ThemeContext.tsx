@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { Appearance } from 'react-native';
 
-interface ThemeContextType {
+export interface iThemeContextType {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<iThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [theme, setTheme] = useState<'light' | 'dark'>(

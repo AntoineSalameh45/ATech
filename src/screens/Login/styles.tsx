@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: globalStyles.light_blue,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     fontFamily: globalStyles.secondary_font,
   },
   signupLink: {
-    color: '#007BFF',
+    color: globalStyles.light_blue,
   },
 });
 

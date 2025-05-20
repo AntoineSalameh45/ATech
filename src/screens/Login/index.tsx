@@ -1,14 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -33,14 +33,32 @@ const LoginScreen = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormInputs) => {
-    const isSuccess = login(data.email, data.password);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-    if (isSuccess) {
-      Alert.alert('Login Successful', 'Welcome back!');
-    } else {
-      Alert.alert('Login Failed', 'Invalid email or password.');
-    }
+  const onSubmit = async (data: LoginFormInputs) => {
+    setIsLoading(true);
+    setErrorMessage('');
+
+    setTimeout(async () => {
+      try {
+        const isSuccess = await login(data.email, data.password);
+
+        if (isSuccess) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            setIsLoading(false);
+            setErrorMessage('Invalid email or password.');
+          }, 1000);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        setErrorMessage('An unexpected error occurred. Please try again.');
+      }
+    }, 2000);
   };
 
   return (
@@ -64,7 +82,7 @@ const LoginScreen = () => {
                   placeholder="example@example.com"
                   placeholderTextColor="#888888"
                   onBlur={onBlur}
-                  onChangeText={(text) => onChange(text.toLowerCase())}
+                  onChangeText={text => onChange(text.toLowerCase())}
                   value={value}
                   keyboardType="email-address"
                 />
@@ -98,10 +116,19 @@ const LoginScreen = () => {
             )}
           />
 
+          {errorMessage !== '' && (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          )}
+
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.loginButtonText}>Login</Text>
+            onPress={handleSubmit(onSubmit)}
+            disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.signupTextContainer}>

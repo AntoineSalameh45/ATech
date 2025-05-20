@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const [users, setUsers] = useState<User[]>([
     {
       email: 'eurisko@gmail.com',
-      password: 'academy2025',
+      password: '123456',
       name: 'Default User',
       phoneNumber: '0000000000',
     },

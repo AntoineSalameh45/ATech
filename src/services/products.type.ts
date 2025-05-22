@@ -40,3 +40,12 @@ export interface ProductsApiResponse {
   data: iProduct[];
   pagination: Pagination;
 }
+
+export type DetailsScreenParams = {
+  title: string;
+  description: string;
+  price: number;
+  images: ProductImage[];
+  latitude: number;
+  longitude: number;
+};

@@ -25,10 +25,34 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   response => response,
-  error => {
-    if (error.response?.status === 401) {
+  async error => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
       console.error('Unauthorized - Token expired or invalid.');
+
+      originalRequest._retry = true;
+
+      try {
+        const refreshAccessToken = AuthStore.getState().refreshAccessToken;
+
+        if (!refreshAccessToken) {
+          console.error('No refresh logic found.');
+          return Promise.reject(error);
+        }
+
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh token:', refreshError);
+        AuthStore.getState().clearTokens();
+        return Promise.reject(refreshError);
+      }
     }
+
     return Promise.reject(error);
   },
 );

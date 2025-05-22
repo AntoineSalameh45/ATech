@@ -27,6 +27,7 @@
     "react-hook-form": "^7.56.2",
     "react-native": "0.79.2",
     "react-native-dotenv": "^3.4.11",
+    "react-native-gesture-handler": "^2.25.0",
     "react-native-image-picker": "^8.2.1",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-maps": "^1.23.8",
@@ -34,6 +35,7 @@
     "react-native-screens": "^4.10.0",
     "react-native-svg": "^15.12.0",
     "react-native-vision-camera": "^4.6.4",
+    "rn-fetch-blob": "^0.12.0",
     "rn-secure-storage": "^3.0.1",
     "zod": "^3.24.4",
     "zustand": "^5.0.4"

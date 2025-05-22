@@ -5,13 +5,13 @@ export type RootStackParamList = {
   OTP: {email: string};
   Camera: {onPhotoTaken: (photoUri: string) => void};
   Details: {
+    _id: string;
     title: string;
     description: string;
     price: number;
     images: {url: string}[];
     latitude: number;
     longitude: number;
-    id: number;
   };
   Profile: {
     name: string;

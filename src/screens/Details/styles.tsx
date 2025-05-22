@@ -35,7 +35,7 @@ export const getDynamicStyles = (theme: string) => {
       marginBottom: scale(10),
       color: isDark ? '#ffffff' : '#000000',
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
     },
     description: {
@@ -47,7 +47,7 @@ export const getDynamicStyles = (theme: string) => {
     },
     priceContainer: {
       flexDirection: 'row',
-      justifyContent:'space-between',
+      justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: scale(20),
       backgroundColor: isDark ? '#1c1c1c' : '#1c1c1c22',
@@ -61,7 +61,7 @@ export const getDynamicStyles = (theme: string) => {
     },
     descriptionContainer: {
       flexDirection: 'column',
-      justifyContent:'flex-start',
+      justifyContent: 'flex-start',
       alignItems: 'flex-start',
       marginBottom: scale(20),
       backgroundColor: isDark ? '#1c1c1c' : '#1c1c1c22',
@@ -83,7 +83,7 @@ export const getDynamicStyles = (theme: string) => {
       fontFamily: globalFonts.price_tag,
       color: primaryColor,
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(4),
     },
     buttonContainer: {
@@ -108,7 +108,7 @@ export const getDynamicStyles = (theme: string) => {
       color: isDark ? '#F5F5F5' : '#E3F2FD',
       fontSize: scale(18),
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
       fontFamily: 'Rancho-Regular',
       textAlign: 'center',
@@ -130,7 +130,7 @@ export const getDynamicStyles = (theme: string) => {
       fontSize: scale(16),
       fontWeight: 'bold',
       textShadowColor: isDark ? '#FF8A65' : '#81D4FA',
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
     },
     map: {
@@ -140,6 +140,23 @@ export const getDynamicStyles = (theme: string) => {
     mapContainer: {
       marginTop: scale(50),
       marginBottom: scale(50),
+    },
+    iconTextContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+
+    contactOwnerButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 10,
+    },
+
+    contactOwnerText: {
+      marginLeft: 8,
+      fontSize: 16,
+      color: theme === 'dark' ? '#fff' : '#000',
     },
   });
 };

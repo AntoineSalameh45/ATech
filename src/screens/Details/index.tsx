@@ -1,12 +1,24 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
-import { getDynamicStyles } from './styles';
-import { useTheme } from '../../stores/ThemeContext';
-import { BASE_URL } from '@env';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Linking,
+  PermissionsAndroid,
+  Platform,
+} from 'react-native';
+import {RouteProp} from '@react-navigation/native';
+import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
+import {getDynamicStyles} from './styles';
+import {useTheme} from '../../stores/ThemeContext';
+import {BASE_URL} from '@env';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import useCartStore from '../../stores/CartStore';
+import {ImageSlider} from '../../components/atoms/ImageSlider';
+import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+import {MailIconBlue, MailIconRed} from '../../assets/svg';
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
@@ -14,31 +26,102 @@ type Props = {
   route: DetailsScreenRouteProp;
 };
 
-const Details = ({ route }: Props) => {
-  const { title, description, price, images, latitude, longitude, id } = route.params;
-  const { theme } = useTheme();
+const Details = ({route}: Props) => {
+  const {title, description, price, images, latitude, longitude, _id} =
+    route.params;
+  const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
-  const { addItem } = useCartStore();
+  const {addItem} = useCartStore();
 
-  const imageUrl =
-    images && images.length > 0
-      ? `${BASE_URL}${images[0].url}`
-      : 'https://via.placeholder.com/300';
+  const formattedImages = images?.map((img: {url: string}) => ({
+    url: `${BASE_URL}${img.url}`,
+  }));
 
   const handleAddToCart = () => {
     addItem({
-      id,
+      _id,
       name: title,
       price,
       quantity: 1,
-      image: imageUrl,
+      image: formattedImages[0]?.url || '',
     });
     Alert.alert('Success', 'Item added to cart!');
   };
 
+  const handleLongPressImage = async (imageUrl: string) => {
+    Alert.alert(
+      'Save Image',
+      'Do you want to save this image to your gallery?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              if (Platform.OS === 'android') {
+                const hasPermission = await PermissionsAndroid.request(
+                  PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                );
+
+                if (hasPermission !== PermissionsAndroid.RESULTS.GRANTED) {
+                  Alert.alert(
+                    'Permission Denied',
+                    'Storage permission is required to save images.',
+                  );
+                  return;
+                }
+              }
+
+              await CameraRoll.saveAsset(imageUrl, {
+                type: 'photo',
+                album: 'ATech',
+              });
+              Alert.alert('Success', 'Image saved!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to save image.');
+              console.error(error);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleContactOwner = () => {
+    const email = 'owner@example.com';
+    const subject = encodeURIComponent(`Inquiry about ${title}`);
+    const body = encodeURIComponent(
+      `Hi,\n\nI am interested in the product "${title}". Please provide more details.\n\nThanks.`,
+    );
+    const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+
+    Linking.canOpenURL(mailtoUrl)
+      .then(supported => {
+        if (!supported) {
+          Alert.alert('Error', 'Unable to open mail client.');
+        } else {
+          Linking.openURL(mailtoUrl);
+        }
+      })
+      .catch(err => {
+        Alert.alert('Error', 'An unexpected error occurred.');
+        console.error(err);
+      });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <ImageSlider
+        images={formattedImages}
+        onImageLongPress={image => {
+          const imageUrl = `${image}`;
+          console.log('Long-pressed image URL:', imageUrl);
+          handleLongPressImage(imageUrl);
+        }}
+      />
       <Text style={styles.title}>{title}</Text>
       <View style={styles.priceContainer}>
         <Text style={styles.priceLabel}>Price:</Text>
@@ -56,6 +139,19 @@ const Details = ({ route }: Props) => {
           <Text style={styles.shareButtonText}>Share</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.iconTextContainer}>
+        <TouchableOpacity
+          style={styles.contactOwnerButton}
+          onPress={handleContactOwner}>
+          {theme === 'dark' ? (
+            <MailIconRed height={26} width={26} />
+          ) : (
+            <MailIconBlue height={26} width={26} />
+          )}
+          <Text style={styles.contactOwnerText}>Contact owner</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.mapContainer}>
         <MapView
           key={theme}
@@ -67,8 +163,7 @@ const Details = ({ route }: Props) => {
             longitudeDelta: 0.0421,
           }}
           style={styles.map}
-          userInterfaceStyle={theme === 'dark' ? 'dark' : 'light'}
-        >
+          userInterfaceStyle={theme === 'dark' ? 'dark' : 'light'}>
           <Marker
             coordinate={{
               latitude: latitude || 33.8886,

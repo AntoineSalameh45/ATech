@@ -36,17 +36,15 @@ const HomeScreen = () => {
   const loadProducts = useCallback(async (pageNumber = 1, query = '') => {
     try {
       const data = await fetchProducts(pageNumber, 10, query);
-      console.log('Fetched data:', data);
-
       setProducts(prev => {
         const combinedProducts =
           pageNumber === 1 ? data.data : [...prev, ...data.data];
         const uniqueProducts = Array.from(
-          new Map(
+          new Map<string, iProduct>(
             combinedProducts.map((product: iProduct) => [product._id, product]),
           ).values(),
         );
-        return uniqueProducts;
+        return uniqueProducts as iProduct[];
       });
 
       setError(null);
@@ -59,10 +57,6 @@ const HomeScreen = () => {
     }
   }, []);
 
-  useEffect(() => {
-    loadProducts(1, searchQuery);
-  }, [loadProducts, searchQuery]);
-
   const onSearch = (query: string) => {
     setSearchQuery(query);
 
@@ -72,9 +66,14 @@ const HomeScreen = () => {
 
     debounceRef.current = setTimeout(() => {
       setPage(1);
+      setIsLoading(true);
       loadProducts(1, query);
     }, 1000);
   };
+
+  useEffect(() => {
+    loadProducts(1, searchQuery);
+  }, [loadProducts, searchQuery]);
 
   useEffect(() => {
     return () => {
@@ -110,54 +109,8 @@ const HomeScreen = () => {
       latitude: item.location.latitude,
       longitude: item.location.longitude,
     };
-
     navigation.navigate('Details', params);
   };
-
-  if (isLoading) {
-    return (
-      <View style={globalDynamicStyles.centeredView}>
-        <ActivityIndicator size="large" color={globalColors.light_blue} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={globalDynamicStyles.centeredView}>
-        <Text style={globalDynamicStyles.errorText}>{error}</Text>
-
-        <TouchableOpacity
-          style={globalDynamicStyles.retryButton}
-          onPress={() => {
-            setIsLoading(true);
-            loadProducts(1, searchQuery);
-          }}>
-          <Text style={globalDynamicStyles.retryButtonText}>
-            {searchQuery ? 'Retry Search' : 'Retry'}
-          </Text>
-        </TouchableOpacity>
-
-        {searchQuery.length > 0 && (
-          <TouchableOpacity
-            style={[
-              globalDynamicStyles.retryButton,
-              {marginTop: 12, backgroundColor: globalColors.red},
-            ]}
-            onPress={() => {
-              setSearchQuery('');
-              setIsLoading(true);
-              setPage(1);
-              loadProducts(1, '');
-            }}>
-            <Text style={globalDynamicStyles.retryButtonText}>
-              Clear Search & Show All
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  }
 
   return (
     <KeyboardAvoidingView
@@ -165,15 +118,49 @@ const HomeScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
       <SearchBar onSearch={onSearch} />
-      <ProductList
-        products={products}
-        onProductPress={navigateToDetails}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        onEndReached={loadMoreProducts}
-        isFetchingMore={isFetchingMore}
-        styles={styles}
-      />
+      {isLoading ? (
+        <View style={globalDynamicStyles.centeredView}>
+          <ActivityIndicator size="large" color={globalColors.light_blue} />
+        </View>
+      ) : error ? (
+        <View style={globalDynamicStyles.centeredView}>
+          <Text style={globalDynamicStyles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={globalDynamicStyles.retryButton}
+            onPress={() => {
+              setIsLoading(true);
+              loadProducts(1, searchQuery);
+            }}>
+            <Text style={globalDynamicStyles.retryButtonText}>
+              {searchQuery ? 'Retry Search' : 'Retry'}
+            </Text>
+          </TouchableOpacity>
+          {searchQuery.length > 0 && (
+            <TouchableOpacity
+              style={[globalDynamicStyles.retryButton, {marginTop: 12}]}
+              onPress={() => {
+                setSearchQuery('');
+                setIsLoading(true);
+                setPage(1);
+                loadProducts(1, '');
+              }}>
+              <Text style={globalDynamicStyles.retryButtonText}>
+                Clear Search & Show All
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ) : (
+        <ProductList
+          products={products}
+          onProductPress={navigateToDetails}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          onEndReached={loadMoreProducts}
+          isFetchingMore={isFetchingMore}
+          styles={styles}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 };

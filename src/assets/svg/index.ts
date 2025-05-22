@@ -9,3 +9,6 @@ export {default as CameraIcon} from './CamerSvg.svg';
 export {default as CameraFlipIcon} from './CameraFlipSvg.svg';
 export {default as RetakeIcon} from './RetakeSvg.svg';
 export {default as CloseCircleIcon} from './CloseCircleSvg.svg';
+export {default as DeleteIconRed} from './DeleteRedSvg.svg';
+export {default as MailIconBlue} from './MailBlueSvg.svg';
+export {default as MailIconRed} from './MailRedSvg.svg';

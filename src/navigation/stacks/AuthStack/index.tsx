@@ -7,6 +7,7 @@ import {HeaderRight} from '../../../components/atoms/HeaderRight';
 import styles from '../../../components/atoms/HeaderRight/styles';
 import { View } from 'react-native';
 import CameraTest from '../../../screens/CameraTest';
+import { globalFonts } from '../../../styles/globalStyles';
 
 const MainStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,7 +46,7 @@ function AuthStack() {
         options={({route}) => ({
           title: route.params?.title || 'Details',
           headerTitleStyle: {
-            fontFamily: 'Roboto',
+            fontFamily: globalFonts.secondary_bold,
             fontSize: 22,
             color: theme === 'light' ? '#000000' : '#ffffff',
           },

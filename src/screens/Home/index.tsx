@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,7 +16,7 @@ import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SearchBar} from '../../components/molecules/Searchbar';
 import {fetchProducts} from '../../services/products';
-import {iProduct} from '../../services/products.type';
+import {DetailsScreenParams, iProduct} from '../../services/products.type';
 
 const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -30,37 +30,53 @@ const HomeScreen = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const loadProducts = async (pageNumber = 1) => {
-    try {
-      const data = await fetchProducts(pageNumber, 10);
-      if (pageNumber === 1) {
-        setProducts(data.data);
-      } else {
-        setProducts(prev => [...prev, ...data.data]);
-      }
-      setError(null);
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
-    } finally {
-      setIsLoading(false);
-      setIsFetchingMore(false);
+  const loadProducts = async (pageNumber = 1, query = '') => {
+  try {
+    const data = await fetchProducts(pageNumber, 10, query);
+    console.log('Fetched data:', data);
+    if (pageNumber === 1) {
+      setProducts(data.data);
+    } else {
+      setProducts(prev => [...prev, ...data.data]);
     }
+    setError(null);
+  } catch (err: any) {
+    console.error('Error during product fetch:', err);
+    setError(err.message || 'Something went wrong');
+  } finally {
+    setIsLoading(false);
+    setIsFetchingMore(false);
+  }
+};
+
+  const onSearch = (query: string) => {
+    setSearchQuery(query);
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      setPage(1);
+      loadProducts(1, query);
+    }, 1000);
   };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
-    await loadProducts(1);
+    await loadProducts(1, searchQuery);
     setRefreshing(false);
-  }, []);
+  }, [searchQuery]);
 
   const loadMoreProducts = async () => {
     if (!isFetchingMore) {
       setIsFetchingMore(true);
       const nextPage = page + 1;
       setPage(nextPage);
-      await loadProducts(nextPage);
+      await loadProducts(nextPage, searchQuery);
     }
   };
 
@@ -69,12 +85,16 @@ const HomeScreen = () => {
   }, []);
 
   const navigateToDetails = (item: iProduct) => {
-    navigation.navigate('Details', {
+    const params: DetailsScreenParams = {
       title: item.title,
       description: item.description,
       price: item.price,
       images: item.images,
-    });
+      latitude: item.location.latitude,
+      longitude: item.location.longitude,
+    };
+
+    navigation.navigate('Details', params);
   };
 
   if (isLoading) {
@@ -96,21 +116,26 @@ const HomeScreen = () => {
         style={globalDynamicStyles.retryButton}
         onPress={() => {
           setIsLoading(true);
-          loadProducts();
+          if (searchQuery) {
+            loadProducts(page, searchQuery);
+          } else {
+            loadProducts();
+          }
         }}>
-        <Text style={globalDynamicStyles.retryButtonText}>Retry</Text>
+        <Text style={globalDynamicStyles.retryButtonText}>
+          {searchQuery ? 'Retry Search' : 'Retry'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
 
   return (
     <KeyboardAvoidingView
       style={styles.viewContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
-      <SearchBar />
+      <SearchBar onSearch={onSearch} />
       <ProductList
         products={products}
         onProductPress={navigateToDetails}

@@ -9,6 +9,7 @@ import styles from '../../../components/atoms/HeaderRight/styles';
 import { iThemeContextType, useTheme } from '../../../stores/ThemeContext';
 import { HeaderRight } from '../../../components/atoms/HeaderRight';
 import ProfileStack from '../../stacks/ProfileStack';
+import CartScreen from '../../../screens/Cart';
 
 const Tab = createBottomTabNavigator();
 
@@ -49,8 +50,8 @@ function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="CameraTest"
-        component={CameraTest}
+        name="Cart"
+        component={CartScreen}
         options={{ headerShown: false }}
       />
       <Tab.Screen

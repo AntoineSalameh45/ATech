@@ -9,8 +9,12 @@ export type RootStackParamList = {
     description: string;
     price: number;
     images: {url: string}[];
+    latitude: number;
+    longitude: number;
+    id: number;
   };
   Profile: {
     name: string;
   };
+  Cart: undefined;
 };

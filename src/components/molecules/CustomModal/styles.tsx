@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import { globalStyles } from '../../../styles/globalStyles';
+import {globalColors, globalFonts} from '../../../styles/globalStyles';
 
 export const getDynamicStyles = (theme: 'light' | 'dark') => {
   const isLight = theme === 'light';
@@ -14,13 +14,11 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
     container: {
       width: '80%',
       backgroundColor: isLight
-        ? globalStyles.colors.light_background
-        : globalStyles.colors.dark_background,
+        ? globalColors.light_background
+        : globalColors.dark_background,
       borderRadius: 16,
       padding: 20,
-      shadowColor: isLight
-        ? globalStyles.colors.light_shadow
-        : globalStyles.colors.dark_shadow,
+      shadowColor: isLight ? globalColors.light_shadow : globalColors.dark_shadow,
       shadowOpacity: 0.3,
       shadowRadius: 5,
       elevation: 10,
@@ -29,16 +27,16 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       fontSize: 18,
       fontWeight: 'bold',
       marginBottom: 10,
-      color: isLight ? globalStyles.colors.light_text : globalStyles.colors.dark_text,
-      fontFamily: globalStyles.secondary_bold,
+      color: isLight ? globalColors.light_text : globalColors.dark_text,
+      fontFamily: globalFonts.secondary_bold,
     },
     message: {
       fontSize: 16,
       marginBottom: 20,
       color: isLight
-        ? globalStyles.colors.light_secondary_text
-        : globalStyles.colors.dark_secondary_text,
-      fontFamily: globalStyles.secondary_font,
+        ? globalColors.light_secondary_text
+        : globalColors.dark_secondary_text,
+      fontFamily: globalFonts.secondary_font,
     },
     buttonContainer: {
       flexDirection: 'column',
@@ -48,17 +46,15 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
     button: {
       paddingVertical: 10,
       paddingHorizontal: 15,
-      backgroundColor: isLight
-        ? globalStyles.colors.light_blue
-        : globalStyles.colors.dark_red,
+      backgroundColor: isLight ? globalColors.light_blue : globalColors.dark_red,
       borderRadius: 8,
       minWidth: 120,
     },
     buttonText: {
-      color: globalStyles.colors.dark_text,
+      color: globalColors.dark_text,
       fontSize: 16,
       textAlign: 'center',
-      fontFamily: globalStyles.secondary_bold,
+      fontFamily: globalFonts.secondary_bold,
     },
   });
 };

@@ -11,11 +11,11 @@ import {
 import { RouteProp, useRoute } from '@react-navigation/native';
 import styles from './styles';
 import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
-import { useAuth } from '../../stores/AuthContext';
+import { AuthStore } from '../../stores/AuthStore';
 
 const OTPScreen = () => {
   const [otp, setOtp] = useState('');
-  const { setAuthenticated } = useAuth();
+  const { setAuthenticated } = AuthStore();
   const route = useRoute<RouteProp<RootStackParamList, 'OTP'>>();
   const { email } = route.params || {};
 
@@ -24,7 +24,7 @@ const OTPScreen = () => {
       Alert.alert('OTP Verified', `Welcome, ${email}!`, [
         {
           text: 'OK',
-          onPress: () => setAuthenticated(true), // Trigger navigation to AuthStack
+          onPress: () => setAuthenticated(true),
         },
       ]);
     } else {

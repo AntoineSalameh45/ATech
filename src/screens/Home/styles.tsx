@@ -1,11 +1,10 @@
 import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
-import { globalStyles } from '../../styles/globalStyles';
+import {globalStyles} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
 
 const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
-
 export const getDynamicStyles = (theme: 'light' | 'dark') => {
   const isLight = theme === 'light';
   const primaryColor = isLight ? '#007BFF' : '#FF4500';
@@ -25,63 +24,67 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
     },
     listContainer: {
       paddingVertical: scale(8),
+      paddingBottom: scale(50),
+      justifyContent: 'space-between',
     },
     productContainer: {
-      flexDirection: 'row',
+      width: '48%',
       marginBottom: scale(16),
-      backgroundColor: isLight ? '#F9FAFB' : '#2D2D2D',
-      borderRadius: scale(8),
-      padding: scale(12),
+      marginHorizontal: scale(4),
+      backgroundColor: isLight ? '#FFFFFF' : '#2D2D2D',
+      borderRadius: scale(12),
+      padding: scale(10),
       shadowColor: glowColor,
-      shadowOpacity: 0.5,
-      shadowRadius: scale(8),
-      elevation: 5,
+      shadowOpacity: 0.3,
+      shadowRadius: scale(6),
+      elevation: 4,
     },
     productImage: {
-      width: scale(100),
-      height: scale(100),
+      width: '100%',
+      aspectRatio: 1,
       borderRadius: scale(8),
-      marginRight: scale(8),
+      marginBottom: scale(8),
       borderWidth: PixelRatio.getPixelSizeForLayoutSize(0.5),
       borderColor: isLight ? primaryColor : '#FF6347',
     },
     productDetails: {
       flex: 1,
+      alignItems: 'flex-start',
     },
     productTitle: {
-      fontSize: scale(16),
+      fontSize: scale(14),
       marginBottom: scale(4),
       color: isLight ? '#000' : '#fff',
       fontFamily: globalStyles.title_font,
-    },
-    productDescription: {
-      fontSize: scale(14),
-      color: isLight ? '#555' : '#ccc',
-      marginBottom: scale(8),
-      fontFamily: globalStyles.primary_font,
     },
     productPrice: {
       fontSize: scale(16),
       fontFamily: globalStyles.price_tag,
       color: primaryColor,
     },
-    clickForMore: {
-      color: primaryColor,
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: isLight ? '#F0F8FF' : '#1C1C1E',
+    },
+    errorText: {
+      color: globalStyles.colors.dark_red,
+      fontSize: 16,
       fontWeight: 'bold',
+      textAlign: 'center',
+      paddingHorizontal: 20,
     },
-    button: {
-      backgroundColor: primaryColor,
-      paddingVertical: scale(10),
-      paddingHorizontal: scale(20),
-      borderRadius: scale(20),
-      shadowColor: glowColor,
-      shadowOpacity: 0.7,
-      shadowRadius: scale(15),
-      elevation: 8,
+    retryButton: {
+      marginTop: 16,
+      padding: 12,
+      backgroundColor: isLight ? globalStyles.colors.light_blue : globalStyles.colors.dark_red,
+      borderRadius: scale(8),
+      alignItems: 'center',
     },
-    buttonText: {
-      fontSize: scale(16),
+    retryButtonText: {
       color: '#fff',
+      fontSize: scale(16),
       fontWeight: 'bold',
     },
   });

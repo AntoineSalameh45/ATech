@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
-import {RouteProp} from '@react-navigation/native';
-import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import {getDynamicStyles} from './styles';
-import {useTheme} from '../../stores/ThemeContext';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
+import { getDynamicStyles } from './styles';
+import { useTheme } from '../../stores/ThemeContext';
+import { BASE_URL } from '@env';
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
@@ -11,14 +12,20 @@ type Props = {
   route: DetailsScreenRouteProp;
 };
 
-const Details = ({route}: Props) => {
-  const {title, description, price, imageUrl} = route.params;
-  const {theme} = useTheme();
+
+const Details = ({ route }: Props) => {
+  const { title, description, price, images } = route.params;
+  const { theme } = useTheme();
   const styles = getDynamicStyles(theme);
+
+  const imageUrl =
+    images && images.length > 0
+      ? `${BASE_URL}${images[0].url}`
+      : 'https://via.placeholder.com/300';
 
   return (
     <View style={styles.container}>
-      <Image source={{uri: imageUrl}} style={styles.image} />
+      <Image source={{ uri: imageUrl }} style={styles.image} />
       <Text style={styles.title}>{title}</Text>
       <View style={styles.priceContainer}>
         <Text style={styles.priceLabel}>Price:</Text>

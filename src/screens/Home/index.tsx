@@ -1,154 +1,108 @@
-import React from 'react';
-import {KeyboardAvoidingView, Platform} from 'react-native';
+import React, {useEffect, useState, useCallback} from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  View,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
+import {globalStyles} from '../../styles/globalStyles';
 import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SearchBar} from '../../components/molecules/Searchbar';
-
-const products = [
-  {
-    _id: '0001',
-    title: 'OnePlus 12',
-    description:
-      'The OnePlus 12 offers flagship-level performance powered by the latest Snapdragon chipset, a stunning AMOLED display with ultra-smooth refresh rates, and exceptional battery life.',
-    price: 1100,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/oneplus/oneplus-12-1.jpg',
-        _id: 'img4',
-      },
-    ],
-  },
-  {
-    _id: '0002',
-    title: 'Xiaomi 13 Ultra',
-    description:
-      'The Xiaomi 13 Ultra is a photography powerhouse equipped with Leica-branded cameras and advanced imaging software.',
-    price: 1000,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-13-ultra-1.jpg',
-        _id: 'img5',
-      },
-    ],
-  },
-  {
-    _id: '0003',
-    title: 'Asus ROG Phone 7',
-    description:
-      'Built for gamers, the Asus ROG Phone 7 features an ultra-fast 165Hz display, advanced cooling systems, and customizable RGB lighting. With a powerful processor and game-optimized features, it delivers a premium gaming experience on the go.',
-    price: 1300,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/asus/asus-rog-phone-7-1.jpg',
-        _id: 'img8',
-      },
-    ],
-  },
-  {
-    _id: '0004',
-    title: 'Sony Xperia 1 V',
-    description:
-      'Tailored for creators, the Sony Xperia 1 V boasts a 4K OLED display with cinematic aspect ratio and professional-grade camera features. It’s a superb device for video editing, content creation, and immersive media viewing.',
-    price: 1400,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/sony/sony-xperia-1-v-1.jpg',
-        _id: 'img9',
-      },
-    ],
-  },
-  {
-    _id: '0005',
-    title: 'Nokia XR21',
-    description:
-      'Engineered for durability, the Nokia XR21 is a rugged smartphone built to withstand extreme environments. With military-grade protection, water resistance, and a large battery, it’s perfect for outdoor adventurers and demanding work conditions.',
-    price: 800,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/nokia/nokia-xr21-1.jpg',
-        _id: 'img10',
-      },
-    ],
-  },
-  {
-    _id: '0006',
-    title: 'Realme GT 5 Pro',
-    description:
-      'The Realme GT 5 Pro offers flagship performance at a fraction of the price. With a bright AMOLED display, top-end processor, and rapid charging, it delivers excellent value for users seeking high performance without breaking the bank.',
-    price: 950,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/realme/realme-gt5-pro-1.jpg',
-        _id: 'img11',
-      },
-    ],
-  },
-  {
-    _id: '0007',
-    title: 'Honor Magic6 Pro',
-    description:
-      'The Honor Magic6 Pro stands out with its elegant design, curved display, and powerful hardware. It includes advanced AI features, a stunning camera setup, and fast charging support, making it a luxurious and capable smartphone.',
-    price: 1250,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/honor/honor-magic6-pro-1.jpg',
-        _id: 'img12',
-      },
-    ],
-  },
-  {
-    _id: '0008',
-    title: 'iPhone 15 Pro Max',
-    description:
-      "The iPhone 15 Pro Max features a premium titanium design, A17 Pro chip, and ProMotion display. With its state-of-the-art camera system, spatial video, and long battery life, it's the most advanced iPhone yet for professionals and enthusiasts alike.",
-    price: 1600,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-1.jpg',
-        _id: 'img14',
-      },
-    ],
-  },
-  {
-    _id: '0009',
-    title: 'Motorola Edge 40 Pro',
-    description:
-      'The Motorola Edge 40 Pro offers a sleek design, curved OLED display, and strong performance powered by Snapdragon. With fast wireless charging and near-stock Android experience, it’s a refined flagship option with excellent value.',
-    price: 899,
-    images: [
-      {
-        url: 'https://fdn2.gsmarena.com/vv/pics/motorola/motorola-edge-40-pro-1.jpg',
-        _id: 'img16',
-      },
-    ],
-  },
-];
-
-const navigateToDetails = (
-  navigation: StackNavigationProp<RootStackParamList>,
-  item: {
-    title: string;
-    description: string;
-    price: number;
-    images: {url: string}[];
-  },
-) => {
-  navigation.navigate('Details', {
-    title: item.title,
-    description: item.description,
-    price: item.price,
-    imageUrl: item.images[0].url,
-  });
-};
+import {fetchProducts} from '../../services/products';
+import {iProduct} from '../../services/products.type';
 
 const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
+
+  const [products, setProducts] = useState<iProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const loadProducts = async (pageNumber = 1) => {
+    try {
+      const data = await fetchProducts(pageNumber, 10);
+      if (pageNumber === 1) {
+        setProducts(data.data);
+      } else {
+        setProducts(prev => [...prev, ...data.data]);
+      }
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setPage(1);
+    await loadProducts(1);
+    setRefreshing(false);
+  }, []);
+
+  const loadMoreProducts = async () => {
+    if (!isFetchingMore) {
+      setIsFetchingMore(true);
+      const nextPage = page + 1;
+      setPage(nextPage);
+      await loadProducts(nextPage);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const navigateToDetails = (item: iProduct) => {
+    navigation.navigate('Details', {
+      title: item.title,
+      description: item.description,
+      price: item.price,
+      images: item.images,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.centeredView}>
+        <ActivityIndicator
+          size="large"
+          color={globalStyles.colors.light_blue}
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+  return (
+    <View style={styles.centeredView}>
+      <Text style={styles.errorText}>{error}</Text>
+      <TouchableOpacity
+        style={styles.retryButton}
+        onPress={() => {
+          setIsLoading(true);
+          loadProducts();
+        }}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 
   return (
     <KeyboardAvoidingView
@@ -158,7 +112,11 @@ const HomeScreen = () => {
       <SearchBar />
       <ProductList
         products={products}
-        onProductPress={item => navigateToDetails(navigation, item)}
+        onProductPress={navigateToDetails}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onEndReached={loadMoreProducts}
+        isFetchingMore={isFetchingMore}
         styles={styles}
       />
     </KeyboardAvoidingView>

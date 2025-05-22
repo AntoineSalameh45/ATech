@@ -14,6 +14,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import getDynamicStyles from './styles';
 import { useTheme } from '../../stores/ThemeContext';
 import { CustomModal } from '../../components/molecules/CustomModal';
+import {AuthStore} from '../../stores/AuthStore';
 
 type AuthStackParamList = {
   Camera: { onPhotoTaken: (photoUri: string) => void };
@@ -39,6 +40,7 @@ const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const navigation = useNavigation<NavigationProp>();
+  const clearTokens = AuthStore((state) => state.clearTokens);
 
   useEffect(() => {
     navigation.setOptions({ title: savedName });
@@ -52,8 +54,9 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    console.log('User logged out!');
+    clearTokens();
     setLogoutModalVisible(false);
+    console.log('User logged out!');
   };
 
   return (

@@ -9,10 +9,6 @@ const schema = z.object({
     .string()
     .min(6, 'Password must be at least 6 characters')
     .nonempty('Password is required'),
-  phoneNumber: z
-    .string()
-    .regex(/^\d{10,15}$/, 'Phone number must be 10-15 digits')
-    .nonempty('Phone number is required'),
 });
 
 export type SignUpFormInputs = z.infer<typeof schema>;

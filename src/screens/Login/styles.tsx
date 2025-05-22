@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { globalStyles } from '../../styles/globalStyles';
+import {StyleSheet} from 'react-native';
+import {globalStyles} from '../../styles/globalStyles';
 
 const styles = StyleSheet.create({
   keyContainer: {
@@ -66,6 +66,9 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     color: globalStyles.light_blue,
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,25 +10,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useAuth} from '../../stores/AuthContext';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './styles';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import {
-  loginSchema,
-  LoginFormInputs,
-} from '../../utils/validation/useLoginForm';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
+import { loginSchema, LoginFormInputs } from '../../utils/validation/useLoginForm';
+import useAuthStore from '../../stores/AuthStore/AuthStore';
+import { login } from '../../services/auth';
 
 const LoginScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const {login} = useAuth();
+  const { setTokens } = useAuthStore();
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
@@ -40,31 +38,29 @@ const LoginScreen = () => {
     setIsLoading(true);
     setErrorMessage('');
 
-    setTimeout(async () => {
-      try {
-        const isSuccess = await login(data.email, data.password);
+    try {
+      const response = await login(data.email, data.password);
 
-        if (isSuccess) {
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            setIsLoading(false);
-            setErrorMessage('Invalid email or password.');
-          }, 1000);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        setErrorMessage('An unexpected error occurred. Please try again.');
+      if (!response.accessToken || !response.refreshToken) {
+        throw new Error('Missing tokens in response.');
       }
-    }, 2000);
+
+      await setTokens(response.accessToken, response.refreshToken);
+    } catch (error: any) {
+      console.error('Login Error:', error);
+      setErrorMessage(
+        error.response?.data?.message || error.message || 'An unexpected error occurred. Please try again.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.keyContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Welcome back</Text>
@@ -75,7 +71,7 @@ const LoginScreen = () => {
           <Controller
             control={control}
             name="email"
-            render={({field: {onChange, onBlur, value}}) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <View>
                 <TextInput
                   style={[styles.input, errors.email && styles.errorInput]}
@@ -85,6 +81,7 @@ const LoginScreen = () => {
                   onChangeText={text => onChange(text.toLowerCase())}
                   value={value}
                   keyboardType="email-address"
+                  autoCapitalize="none"
                 />
                 {errors.email && (
                   <Text style={styles.errorText}>{errors.email.message}</Text>
@@ -96,7 +93,7 @@ const LoginScreen = () => {
           <Controller
             control={control}
             name="password"
-            render={({field: {onChange, onBlur, value}}) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <View>
                 <TextInput
                   style={[styles.input, errors.password && styles.errorInput]}
@@ -106,11 +103,10 @@ const LoginScreen = () => {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  autoCapitalize="none"
                 />
                 {errors.password && (
-                  <Text style={styles.errorText}>
-                    {errors.password.message}
-                  </Text>
+                  <Text style={styles.errorText}>{errors.password.message}</Text>
                 )}
               </View>
             )}
@@ -121,9 +117,10 @@ const LoginScreen = () => {
           )}
 
           <TouchableOpacity
-            style={styles.loginButton}
+            style={[styles.loginButton, isLoading && styles.disabledButton]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}>
+            disabled={isLoading}
+          >
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -136,7 +133,8 @@ const LoginScreen = () => {
               Don't have an account?{' '}
               <Text
                 style={styles.signupLink}
-                onPress={() => navigation.navigate('SignUp')}>
+                onPress={() => navigation.navigate('SignUp')}
+              >
                 Sign Up
               </Text>
             </Text>

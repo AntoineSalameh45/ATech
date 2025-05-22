@@ -1,7 +1,7 @@
-import { StyleSheet, Dimensions, PixelRatio } from 'react-native';
-import { globalFonts } from '../../styles/globalStyles';
+import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
+import {globalFonts} from '../../styles/globalStyles';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
 
 const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
@@ -23,7 +23,7 @@ export const getDynamicStyles = (theme: string) => {
       marginBottom: scale(20),
       color: isDark ? '#ffffff' : '#000000',
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
     },
     productCard: {
@@ -115,7 +115,7 @@ export const getDynamicStyles = (theme: string) => {
       fontFamily: globalFonts.title_font,
       color: '#ffffff',
       textShadowColor: saberGlow,
-      textShadowOffset: { width: 0, height: 0 },
+      textShadowOffset: {width: 0, height: 0},
       textShadowRadius: scale(6),
     },
     emptyStateContainer: {
@@ -167,7 +167,7 @@ export const getDynamicStyles = (theme: string) => {
       color: isDark ? '#ffffff' : '#333333',
     },
     removeButton: {
-      backgroundColor: isDark ? '#FF4500' : '#FF6347',
+      backgroundColor: 'transparent',
       borderRadius: scale(6),
       padding: scale(8),
     },
@@ -178,6 +178,18 @@ export const getDynamicStyles = (theme: string) => {
     totalAmount: {
       fontSize: scale(18),
       color: primaryColor,
+    },
+    clearCartButton: {
+      marginVertical: 20,
+      padding: 10,
+      backgroundColor: '#ff6b6b',
+      borderRadius: 10,
+      alignItems: 'center',
+    },
+    clearCartButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   });
 };

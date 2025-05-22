@@ -6,7 +6,7 @@ import { useTheme } from '../../../stores/ThemeContext';
 import { View } from 'react-native';
 import { HeaderRight } from '../../../components/atoms/HeaderRight';
 import styles from '../../../components/atoms/HeaderRight/styles';
-import { globalStyles } from '../../../styles/globalStyles';
+import { globalFonts } from '../../../styles/globalStyles';
 
 const ProfileStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -24,7 +24,7 @@ function ProfileNav() {
             },
             headerTintColor: theme === 'light' ? '#000000' : '#ffffff',
             headerTitleStyle: {
-              fontFamily: globalStyles.secondary_bold,
+              fontFamily: globalFonts.secondary_bold,
               fontSize: 26,
               color: theme === 'light' ? '#000000' : '#ffffff',
             },

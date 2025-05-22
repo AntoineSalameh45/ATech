@@ -54,7 +54,7 @@ function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Profile"
+        name="ProfileNavigator"
         component={ProfileStack}
         options={{ headerShown: false }}
       />

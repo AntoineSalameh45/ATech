@@ -11,7 +11,7 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
-import {globalStyles} from '../../styles/globalStyles';
+import {globalColors, globalStyles} from '../../styles/globalStyles';
 import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SearchBar} from '../../components/molecules/Searchbar';
@@ -22,6 +22,7 @@ const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
+  const globalDynamicStyles = globalStyles(theme);
 
   const [products, setProducts] = useState<iProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,10 +79,10 @@ const HomeScreen = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.centeredView}>
+      <View style={globalDynamicStyles.centeredView}>
         <ActivityIndicator
           size="large"
-          color={globalStyles.colors.light_blue}
+          color={globalColors.light_blue}
         />
       </View>
     );
@@ -89,15 +90,15 @@ const HomeScreen = () => {
 
   if (error) {
   return (
-    <View style={styles.centeredView}>
-      <Text style={styles.errorText}>{error}</Text>
+    <View style={globalDynamicStyles.centeredView}>
+      <Text style={globalDynamicStyles.errorText}>{error}</Text>
       <TouchableOpacity
-        style={styles.retryButton}
+        style={globalDynamicStyles.retryButton}
         onPress={() => {
           setIsLoading(true);
           loadProducts();
         }}>
-        <Text style={styles.retryButtonText}>Retry</Text>
+        <Text style={globalDynamicStyles.retryButtonText}>Retry</Text>
       </TouchableOpacity>
     </View>
   );

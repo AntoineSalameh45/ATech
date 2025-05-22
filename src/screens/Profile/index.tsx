@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { useNavigation } from '@react-navigation/native';
-import type { CompositeNavigationProp } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import React, {useState, useEffect} from 'react';
+import {View, Text, TextInput, TouchableOpacity, Image} from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation} from '@react-navigation/native';
+import type {CompositeNavigationProp} from '@react-navigation/native';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import getDynamicStyles from './styles';
-import { useTheme } from '../../stores/ThemeContext';
-import { CustomModal } from '../../components/molecules/CustomModal';
+import {useTheme} from '../../stores/ThemeContext';
+import {CustomModal} from '../../components/molecules/CustomModal';
 import {AuthStore} from '../../stores/AuthStore';
+import api from '../../services/api';
+import {globalStyles} from '../../styles/globalStyles';
 
 type AuthStackParamList = {
-  Camera: { onPhotoTaken: (photoUri: string) => void };
+  Camera: {onPhotoTaken: (photoUri: string) => void};
 };
 
 type MainNavigatorParamList = {
-  Profile: undefined;
+  Profile: {userId?: string};
   AuthStack: undefined;
 };
 
@@ -31,26 +27,47 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 const ProfileScreen = () => {
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
-  const [name, setName] = useState('John Doe');
+  const globalDynamicStyles = globalStyles(theme);
+  const navigation = useNavigation<NavigationProp>();
+  const clearTokens = AuthStore(state => state.clearTokens);
+
+  const [profile, setProfile] = useState<any>(null);
   const [savedName, setSavedName] = useState('John Doe');
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const navigation = useNavigation<NavigationProp>();
-  const clearTokens = AuthStore((state) => state.clearTokens);
+
+  const fetchProfile = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const endpoint = 'api/user/profile';
+      const response = await api.get(endpoint);
+      setProfile(response.data.data.user);
+      setSavedName(
+        `${response.data.data.user.firstName} ${response.data.data.user.lastName}`,
+      );
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    navigation.setOptions({ title: savedName });
-  }, [navigation, savedName]);
-
-  const handleEditPhoto = () => setModalVisible(true);
+    fetchProfile();
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false);
-    setSavedName(name);
+    setSavedName(
+      profile ? profile.firstName + ' ' + profile.lastName : savedName,
+    );
   };
 
   const handleLogout = () => {
@@ -58,6 +75,13 @@ const ProfileScreen = () => {
     setLogoutModalVisible(false);
     console.log('User logged out!');
   };
+  if (isLoading) {
+    return (
+      <View style={globalDynamicStyles.centeredView}>
+        <Text style={styles.nameText}>Loading profile...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -78,7 +102,7 @@ const ProfileScreen = () => {
           {
             text: 'Choose from Library',
             onPress: () => {
-              launchImageLibrary({ mediaType: 'photo' }, (response) => {
+              launchImageLibrary({mediaType: 'photo'}, response => {
                 if (response.assets && response.assets.length > 0) {
                   const uri = response.assets[0].uri;
                   setPhotoUri(uri || null);
@@ -112,13 +136,14 @@ const ProfileScreen = () => {
         onClose={() => setLogoutModalVisible(false)}
       />
 
-      {/* Profile Content */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleEditPhoto} style={styles.imageWrapper}>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Image
             source={
               photoUri
-                ? { uri: photoUri }
+                ? {uri: photoUri}
+                : profile?.profileImage?.url
+                ? {uri: profile.profileImage.url}
                 : require('../../assets/profile-placeholder.png')
             }
             style={styles.profileImage}
@@ -128,30 +153,54 @@ const ProfileScreen = () => {
           {isEditing ? (
             <TextInput
               style={styles.nameInput}
-              value={name}
-              onChangeText={setName}
+              value={
+                profile ? `${profile.firstName} ${profile.lastName}` : savedName
+              }
+              onChangeText={text => {
+                const [firstName, lastName] = text.split(' ');
+                if (profile) {
+                  setProfile({...profile, firstName, lastName});
+                } else {
+                  setSavedName(text);
+                }
+              }}
             />
           ) : (
-            <Text style={styles.nameText}>{savedName}</Text>
+            <Text style={styles.nameText}>
+              {profile ? `${profile.firstName} ${profile.lastName}` : savedName}
+            </Text>
           )}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={isEditing ? handleSave : () => setIsEditing(true)}
-            >
-              <Text style={styles.editButtonText}>
-                {isEditing ? 'Save' : 'Edit'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={() => setLogoutModalVisible(true)}
-            >
-              <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={isEditing ? handleSave : () => setIsEditing(true)}>
+          <Text style={styles.editButtonText}>
+            {isEditing ? 'Save' : 'Edit'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => setLogoutModalVisible(true)}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
+      {error && (
+        <View style={globalDynamicStyles.centeredView}>
+          <Text style={globalDynamicStyles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={globalDynamicStyles.retryButton}
+            onPress={() => {
+              setIsLoading(true);
+              fetchProfile();
+            }}>
+            <Text style={globalDynamicStyles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

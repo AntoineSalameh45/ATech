@@ -13,6 +13,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 24,
+      gap: 10,
     },
     imageWrapper: {
       marginRight: 16,
@@ -47,9 +48,12 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
       color: isDark ? '#fff' : '#000',
     },
     buttonContainer: {
-        flexDirection: 'row',
-        gap: 10,
+      flexDirection: 'row',
+      gap: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
+
     editButton: {
       backgroundColor: isDark ? '#1C1C1Edd' : '#87CEEB',
       padding: 10,

@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {globalStyles} from '../../styles/globalStyles';
+import {globalColors, globalFonts} from '../../styles/globalStyles';
 
 const styles = StyleSheet.create({
   keyContainer: {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
-    fontFamily: globalStyles.secondary_font,
+    fontFamily: globalFonts.secondary_font,
   },
   input: {
     height: 40,
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButton: {
-    backgroundColor: globalStyles.light_blue,
+    backgroundColor: globalColors.light_blue,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: globalStyles.secondary_bold,
+    fontFamily: globalFonts.secondary_bold,
   },
   signupTextContainer: {
     marginTop: 20,
@@ -62,10 +62,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#333',
     textAlign: 'center',
-    fontFamily: globalStyles.secondary_font,
+    fontFamily: globalFonts.secondary_font,
   },
   signupLink: {
-    color: globalStyles.light_blue,
+    color: globalColors.light_blue,
   },
   disabledButton: {
     opacity: 0.6,

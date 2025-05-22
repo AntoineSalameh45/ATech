@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import { globalStyles } from '../../styles/globalStyles';
+import { globalFonts } from '../../styles/globalStyles';
 
 const styles = StyleSheet.create({
   keyContainer: {
@@ -18,13 +18,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
-    fontFamily: globalStyles.primary_font,
+    fontFamily: globalFonts.primary_font,
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
     color: '#333',
-    fontFamily: globalStyles.primary_font,
+    fontFamily: globalFonts.primary_font,
   },
   input: {
     borderWidth: 1,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: globalStyles.secondary_bold,
+    fontFamily: globalFonts.secondary_bold,
   },
   signupTextContainer: {
     marginTop: 20,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#333',
     textAlign: 'center',
-    fontFamily: globalStyles.secondary_font,
+    fontFamily: globalFonts.secondary_font,
   },
   signupLink: {
     color: '#007BFF',

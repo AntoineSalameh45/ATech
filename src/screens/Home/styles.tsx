@@ -1,5 +1,5 @@
 import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
-import {globalStyles} from '../../styles/globalStyles';
+import {globalFonts} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -55,37 +55,12 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       fontSize: scale(14),
       marginBottom: scale(4),
       color: isLight ? '#000' : '#fff',
-      fontFamily: globalStyles.title_font,
+      fontFamily: globalFonts.title_font,
     },
     productPrice: {
       fontSize: scale(16),
-      fontFamily: globalStyles.price_tag,
+      fontFamily: globalFonts.price_tag,
       color: primaryColor,
-    },
-    centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: isLight ? '#F0F8FF' : '#1C1C1E',
-    },
-    errorText: {
-      color: globalStyles.colors.dark_red,
-      fontSize: 16,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      paddingHorizontal: 20,
-    },
-    retryButton: {
-      marginTop: 16,
-      padding: 12,
-      backgroundColor: isLight ? globalStyles.colors.light_blue : globalStyles.colors.dark_red,
-      borderRadius: scale(8),
-      alignItems: 'center',
-    },
-    retryButtonText: {
-      color: '#fff',
-      fontSize: scale(16),
-      fontWeight: 'bold',
     },
   });
 };

@@ -42,6 +42,7 @@ export interface ProductsApiResponse {
 }
 
 export type DetailsScreenParams = {
+  _id: string;
   title: string;
   description: string;
   price: number;

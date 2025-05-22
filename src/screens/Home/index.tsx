@@ -33,24 +33,35 @@ const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const loadProducts = async (pageNumber = 1, query = '') => {
-  try {
-    const data = await fetchProducts(pageNumber, 10, query);
-    console.log('Fetched data:', data);
-    if (pageNumber === 1) {
-      setProducts(data.data);
-    } else {
-      setProducts(prev => [...prev, ...data.data]);
+  const loadProducts = useCallback(async (pageNumber = 1, query = '') => {
+    try {
+      const data = await fetchProducts(pageNumber, 10, query);
+      console.log('Fetched data:', data);
+
+      setProducts(prev => {
+        const combinedProducts =
+          pageNumber === 1 ? data.data : [...prev, ...data.data];
+        const uniqueProducts = Array.from(
+          new Map(
+            combinedProducts.map((product: iProduct) => [product._id, product]),
+          ).values(),
+        );
+        return uniqueProducts;
+      });
+
+      setError(null);
+    } catch (err: any) {
+      console.error('Error during product fetch:', err);
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+      setIsFetchingMore(false);
     }
-    setError(null);
-  } catch (err: any) {
-    console.error('Error during product fetch:', err);
-    setError(err.message || 'Something went wrong');
-  } finally {
-    setIsLoading(false);
-    setIsFetchingMore(false);
-  }
-};
+  }, []);
+
+  useEffect(() => {
+    loadProducts(1, searchQuery);
+  }, [loadProducts, searchQuery]);
 
   const onSearch = (query: string) => {
     setSearchQuery(query);
@@ -58,18 +69,20 @@ const HomeScreen = () => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
+
     debounceRef.current = setTimeout(() => {
       setPage(1);
       loadProducts(1, query);
     }, 1000);
   };
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setPage(1);
-    await loadProducts(1, searchQuery);
-    setRefreshing(false);
-  }, [searchQuery]);
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   const loadMoreProducts = async () => {
     if (!isFetchingMore) {
@@ -80,12 +93,16 @@ const HomeScreen = () => {
     }
   };
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setPage(1);
+    await loadProducts(1, searchQuery);
+    setRefreshing(false);
+  }, [loadProducts, searchQuery]);
 
   const navigateToDetails = (item: iProduct) => {
     const params: DetailsScreenParams = {
+      _id: item._id,
       title: item.title,
       description: item.description,
       price: item.price,
@@ -100,35 +117,47 @@ const HomeScreen = () => {
   if (isLoading) {
     return (
       <View style={globalDynamicStyles.centeredView}>
-        <ActivityIndicator
-          size="large"
-          color={globalColors.light_blue}
-        />
+        <ActivityIndicator size="large" color={globalColors.light_blue} />
       </View>
     );
   }
 
   if (error) {
-  return (
-    <View style={globalDynamicStyles.centeredView}>
-      <Text style={globalDynamicStyles.errorText}>{error}</Text>
-      <TouchableOpacity
-        style={globalDynamicStyles.retryButton}
-        onPress={() => {
-          setIsLoading(true);
-          if (searchQuery) {
-            loadProducts(page, searchQuery);
-          } else {
-            loadProducts();
-          }
-        }}>
-        <Text style={globalDynamicStyles.retryButtonText}>
-          {searchQuery ? 'Retry Search' : 'Retry'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+    return (
+      <View style={globalDynamicStyles.centeredView}>
+        <Text style={globalDynamicStyles.errorText}>{error}</Text>
+
+        <TouchableOpacity
+          style={globalDynamicStyles.retryButton}
+          onPress={() => {
+            setIsLoading(true);
+            loadProducts(1, searchQuery);
+          }}>
+          <Text style={globalDynamicStyles.retryButtonText}>
+            {searchQuery ? 'Retry Search' : 'Retry'}
+          </Text>
+        </TouchableOpacity>
+
+        {searchQuery.length > 0 && (
+          <TouchableOpacity
+            style={[
+              globalDynamicStyles.retryButton,
+              {marginTop: 12, backgroundColor: globalColors.red},
+            ]}
+            onPress={() => {
+              setSearchQuery('');
+              setIsLoading(true);
+              setPage(1);
+              loadProducts(1, '');
+            }}>
+            <Text style={globalDynamicStyles.retryButtonText}>
+              Clear Search & Show All
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

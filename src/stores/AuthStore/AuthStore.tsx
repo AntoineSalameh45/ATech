@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
-import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
-import { refreshTokenreq } from '../../services/auth';
+import {create} from 'zustand';
+import {createJSONStorage, persist, StateStorage} from 'zustand/middleware';
+import RNSecureStorage, {ACCESSIBLE} from 'rn-secure-storage';
+import {refreshTokenreq} from '../../services/auth';
 
 export interface iAuthState {
   accessToken: string | null;
@@ -22,7 +22,7 @@ const SecureStorage: StateStorage = {
     console.log(`[SecureStorage] Successfully set item: ${name}`);
   },
 
-  getItem: async (name) => {
+  getItem: async name => {
     try {
       const value = await RNSecureStorage.getItem(name);
       return value;
@@ -42,7 +42,7 @@ const SecureStorage: StateStorage = {
     }
   },
 
-  removeItem: async (name) => {
+  removeItem: async name => {
     await RNSecureStorage.removeItem(name);
   },
 };
@@ -55,18 +55,18 @@ const useAuthStore = create<iAuthState>()(
       isAuthenticated: false,
 
       setTokens: (accessToken, refreshToken) => {
-        console.log('[AuthStore] Setting tokens:', { accessToken, refreshToken });
-        set({ accessToken, refreshToken, isAuthenticated: !!accessToken });
+        console.log('[AuthStore] Setting tokens:', {accessToken, refreshToken});
+        set({accessToken, refreshToken, isAuthenticated: !!accessToken});
       },
 
       clearTokens: () => {
         console.log('[AuthStore] Clearing tokens.');
-        set({ accessToken: null, refreshToken: null, isAuthenticated: false });
+        set({accessToken: null, refreshToken: null, isAuthenticated: false});
       },
 
-      setAuthenticated: (value) => {
+      setAuthenticated: value => {
         console.log(`[AuthStore] Setting authentication status: ${value}`);
-        set({ isAuthenticated: value });
+        set({isAuthenticated: value});
       },
 
       refreshAccessToken: async (): Promise<string | null> => {
@@ -82,18 +82,18 @@ const useAuthStore = create<iAuthState>()(
           const response = await refreshTokenreq(refreshToken);
           console.log('[AuthStore] Refresh token response:', response);
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          const {accessToken, refreshToken: newRefreshToken} = response;
 
           if (!accessToken || !newRefreshToken) {
             throw new Error('Invalid token response structure.');
           }
 
-          set({ accessToken, refreshToken: newRefreshToken });
+          set({accessToken, refreshToken: newRefreshToken});
           console.log('[AuthStore] Access token refreshed.');
           return accessToken;
         } catch (error: any) {
           console.error('[AuthStore] Failed to refresh access token:', error);
-          set({ accessToken: null, refreshToken: null, isAuthenticated: false });
+          set({accessToken: null, refreshToken: null, isAuthenticated: false});
           return null;
         }
       },
@@ -101,7 +101,7 @@ const useAuthStore = create<iAuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => SecureStorage),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         if (state) {
           console.log('[Zustand] Hydrated auth store:', state);
         }

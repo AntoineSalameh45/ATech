@@ -12,9 +12,9 @@ export const getDynamicStyles = (theme: string) => {
   const primaryColor = isDark ? '#FF4500' : '#007BFF';
 
   return StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: scale(20),
+    scrollContainer: {
+      flexGrow: 1,
+      padding: 16,
       backgroundColor: isDark ? '#121212' : '#F0F8FF',
     },
     image: {
@@ -35,7 +35,7 @@ export const getDynamicStyles = (theme: string) => {
       marginBottom: scale(10),
       color: isDark ? '#ffffff' : '#000000',
       textShadowColor: saberGlow,
-      textShadowOffset: {width: 0, height: 0},
+      textShadowOffset: { width: 0, height: 0 },
       textShadowRadius: scale(6),
     },
     description: {
@@ -47,8 +47,22 @@ export const getDynamicStyles = (theme: string) => {
     },
     priceContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent:'space-between',
       alignItems: 'center',
+      marginBottom: scale(20),
+      backgroundColor: isDark ? '#1c1c1c' : '#1c1c1c22',
+      padding: scale(10),
+      borderRadius: scale(10),
+      borderWidth: 1,
+      borderColor: isDark ? '#444' : '#ddd',
+      shadowColor: isDark ? '#000' : '#aaa',
+      shadowOpacity: 0.2,
+      shadowRadius: scale(5),
+    },
+    descriptionContainer: {
+      flexDirection: 'column',
+      justifyContent:'flex-start',
+      alignItems: 'flex-start',
       marginBottom: scale(20),
       backgroundColor: isDark ? '#1c1c1c' : '#1c1c1c22',
       padding: scale(10),
@@ -69,7 +83,7 @@ export const getDynamicStyles = (theme: string) => {
       fontFamily: globalFonts.price_tag,
       color: primaryColor,
       textShadowColor: saberGlow,
-      textShadowOffset: {width: 0, height: 0},
+      textShadowOffset: { width: 0, height: 0 },
       textShadowRadius: scale(4),
     },
     buttonContainer: {
@@ -94,7 +108,7 @@ export const getDynamicStyles = (theme: string) => {
       color: isDark ? '#F5F5F5' : '#E3F2FD',
       fontSize: scale(18),
       textShadowColor: saberGlow,
-      textShadowOffset: {width: 0, height: 0},
+      textShadowOffset: { width: 0, height: 0 },
       textShadowRadius: scale(6),
       fontFamily: 'Rancho-Regular',
       textAlign: 'center',
@@ -116,8 +130,16 @@ export const getDynamicStyles = (theme: string) => {
       fontSize: scale(16),
       fontWeight: 'bold',
       textShadowColor: isDark ? '#FF8A65' : '#81D4FA',
-      textShadowOffset: {width: 0, height: 0},
+      textShadowOffset: { width: 0, height: 0 },
       textShadowRadius: scale(6),
+    },
+    map: {
+      height: scale(300),
+      width: '100%',
+    },
+    mapContainer: {
+      marginTop: scale(50),
+      marginBottom: scale(50),
     },
   });
 };

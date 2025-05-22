@@ -9,7 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import {globalStyles} from '../../../styles/globalStyles';
+import {globalColors} from '../../../styles/globalStyles';
 
 const ProductList = ({
   products,
@@ -45,7 +45,7 @@ const ProductList = ({
       <View style={{paddingVertical: 16}}>
         <ActivityIndicator
           size="small"
-          color={globalStyles.colors.light_blue}
+          color={globalColors.light_blue}
         />
       </View>
     ) : null;

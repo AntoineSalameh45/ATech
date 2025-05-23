@@ -27,7 +27,7 @@ type Props = {
 };
 
 const Details = ({route}: Props) => {
-  const {title, description, price, images, latitude, longitude, _id} =
+  const {title, description, price, images, latitude, longitude, _id, user} =
     route.params;
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
@@ -91,7 +91,12 @@ const Details = ({route}: Props) => {
   };
 
   const handleContactOwner = () => {
-    const email = 'owner@example.com';
+    const email = user?.email;
+    if (!email) {
+      Alert.alert('Error', 'Owner email is not available.');
+      return;
+    }
+
     const subject = encodeURIComponent(`Inquiry about ${title}`);
     const body = encodeURIComponent(
       `Hi,\n\nI am interested in the product "${title}". Please provide more details.\n\nThanks.`,

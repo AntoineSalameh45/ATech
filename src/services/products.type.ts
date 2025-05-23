@@ -1,15 +1,15 @@
-export interface ProductLocation {
+export interface iProductLocation {
   name: string;
   longitude: number;
   latitude: number;
 }
 
-export interface ProductImage {
+export interface iProductImage {
   url: string;
   _id: string;
 }
 
-export interface ProductUser {
+export interface iProductUser {
   _id: string;
   email: string;
 }
@@ -19,14 +19,14 @@ export interface iProduct {
   title: string;
   description: string;
   price: number;
-  images: ProductImage[];
-  location: ProductLocation;
-  user: ProductUser;
+  images: iProductImage[];
+  location: iProductLocation;
+  user: iProductUser;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Pagination {
+export interface iPagination {
   currentPage: number;
   totalPages: number;
   hasNextPage: boolean;
@@ -35,18 +35,20 @@ export interface Pagination {
   limit: number;
 }
 
-export interface ProductsApiResponse {
+export interface iProductsApiResponse {
   success: boolean;
   data: iProduct[];
-  pagination: Pagination;
+  pagination: iPagination;
 }
+
 
 export type DetailsScreenParams = {
   _id: string;
   title: string;
   description: string;
   price: number;
-  images: ProductImage[];
+  images: iProductImage[];
   latitude: number;
   longitude: number;
+  user: iProductUser;
 };

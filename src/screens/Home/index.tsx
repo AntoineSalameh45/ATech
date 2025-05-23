@@ -108,6 +108,7 @@ const HomeScreen = () => {
       images: item.images,
       latitude: item.location.latitude,
       longitude: item.location.longitude,
+      user: item.user,
     };
     navigation.navigate('Details', params);
   };

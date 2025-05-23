@@ -63,7 +63,6 @@ const Details = ({route}: Props) => {
         const user = await fetchCurrentUser();
         if (user) {
           setCurrentUserEmail(user.email);
-          console.log('Fetched user email:', user.email);
         }
       } catch (error) {
         console.error('Error setting user email:', error);
@@ -156,7 +155,6 @@ const Details = ({route}: Props) => {
   };
 
   const isProductOwner = currentUserEmail === productOwner?.email;
-  console.log({currentUserEmail, productOwner});
 
   const handleEditProduct = () => {
     if (!isProductOwner) {
@@ -177,6 +175,49 @@ const Details = ({route}: Props) => {
       longitude,
       locationName,
     });
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!isProductOwner) {
+      Alert.alert(
+        'Unauthorized',
+        'You are not authorized to delete this product.',
+      );
+      return;
+    }
+
+    Alert.alert(
+      'Delete Confirmation',
+      'Are you sure you want to delete this product?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const response = await api.delete(`/api/products/${_id}`);
+              if (response.status === 200) {
+                Alert.alert('Success', 'Product deleted successfully.');
+                navigation.goBack();
+              } else {
+                throw new Error('Failed to delete product.');
+              }
+            } catch (error) {
+              console.error('Delete product error:', error);
+              Alert.alert(
+                'Error',
+                'An unexpected error occurred while deleting the product.',
+              );
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   return (
@@ -204,6 +245,11 @@ const Details = ({route}: Props) => {
             style={styles.editButton}
             onPress={handleEditProduct}>
             <Text style={styles.editButtonText}>Edit Product</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={handleDeleteProduct}>
+            <Text style={styles.editButtonText}>Delete Product</Text>
           </TouchableOpacity>
         </View>
       )}

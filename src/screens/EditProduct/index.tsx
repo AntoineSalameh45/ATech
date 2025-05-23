@@ -58,7 +58,7 @@ const EditProduct = ({ route }: Props) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/products/${productId}`, {
+      const response = await fetch(`${BASE_URL}/api/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

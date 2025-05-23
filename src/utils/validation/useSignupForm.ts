@@ -3,8 +3,18 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const schema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').nonempty('Name is required'),
-  email: z.string().email('Invalid email format').nonempty('Email is required'),
+  firstName: z
+    .string()
+    .min(2, 'First name must be at least 2 characters')
+    .nonempty('First name is required'),
+  lastName: z
+    .string()
+    .min(2, 'Last name must be at least 2 characters')
+    .nonempty('Last name is required'),
+  email: z
+    .string()
+    .email('Invalid email format')
+    .nonempty('Email is required'),
   password: z
     .string()
     .min(6, 'Password must be at least 6 characters')

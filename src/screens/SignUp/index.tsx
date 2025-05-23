@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -11,20 +11,23 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Controller } from 'react-hook-form';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
+import {Controller} from 'react-hook-form';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import styles from './styles';
-import useSignUpForm, { SignUpFormInputs } from '../../utils/validation/useSignupForm';
-import { signup } from '../../services/auth';
+import useSignUpForm, {
+  SignUpFormInputs,
+} from '../../utils/validation/useSignupForm';
+import {signup} from '../../services/auth';
 
 const SignUp = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'SignUp'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, 'SignUp'>>();
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useSignUpForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,22 +35,27 @@ const SignUp = () => {
     const formData = new FormData();
     formData.append('email', data.email);
     formData.append('password', data.password);
-    formData.append('firstName', data.name.split(' ')[0]);
-    formData.append('lastName', data.name.split(' ').slice(1).join(' '));
-    // Append profileImage if implemented
-    // if (profileImage) formData.append('profileImage', { uri: profileImage, name: 'photo.jpg', type: 'image/jpeg' });
+    formData.append('firstName', data.firstName);
+    formData.append('lastName', data.lastName);
 
     try {
       setIsSubmitting(true);
       const response = await signup(formData);
       if (response.success) {
-        Alert.alert('Success', 'User created successfully. Please check your email for verification.');
-        navigation.navigate('OTP', { email: data.email });
+        Alert.alert('Success', response.data.message);
+        navigation.navigate('OTP', {email: data.email});
       } else {
-        Alert.alert('Error', 'Something went wrong. Please try again.');
+        Alert.alert(
+          'Error',
+          response.data.message || 'Something went wrong. Please try again.',
+        );
       }
     } catch (error) {
-      Alert.alert('Error', error.message || 'Failed to register. Please try again.');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to register. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -66,18 +74,47 @@ const SignUp = () => {
 
             <Controller
               control={control}
-              name="name"
-              render={({ field: { onChange, onBlur, value } }) => (
+              name="firstName"
+              render={({field: {onChange, onBlur, value}}) => (
                 <View>
-                  <Text style={styles.label}>Name</Text>
+                  <Text style={styles.label}>First Name</Text>
                   <TextInput
-                    style={[styles.input, errors.name && styles.errorInput]}
-                    placeholder="Name"
+                    style={[
+                      styles.input,
+                      errors.firstName && styles.errorInput,
+                    ]}
+                    placeholder="First Name"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
                   />
-                  {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+                  {errors.firstName && (
+                    <Text style={styles.errorText}>
+                      {errors.firstName.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="lastName"
+              render={({field: {onChange, onBlur, value}}) => (
+                <View>
+                  <Text style={styles.label}>Last Name</Text>
+                  <TextInput
+                    style={[styles.input, errors.lastName && styles.errorInput]}
+                    placeholder="Last Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.lastName && (
+                    <Text style={styles.errorText}>
+                      {errors.lastName.message}
+                    </Text>
+                  )}
                 </View>
               )}
             />
@@ -85,7 +122,7 @@ const SignUp = () => {
             <Controller
               control={control}
               name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
+              render={({field: {onChange, onBlur, value}}) => (
                 <View>
                   <Text style={styles.label}>Email</Text>
                   <TextInput
@@ -96,7 +133,9 @@ const SignUp = () => {
                     value={value}
                     keyboardType="email-address"
                   />
-                  {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+                  {errors.email && (
+                    <Text style={styles.errorText}>{errors.email.message}</Text>
+                  )}
                 </View>
               )}
             />
@@ -104,7 +143,7 @@ const SignUp = () => {
             <Controller
               control={control}
               name="password"
-              render={({ field: { onChange, onBlur, value } }) => (
+              render={({field: {onChange, onBlur, value}}) => (
                 <View>
                   <Text style={styles.label}>Password</Text>
                   <TextInput
@@ -115,19 +154,23 @@ const SignUp = () => {
                     onChangeText={onChange}
                     value={value}
                   />
-                  {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+                  {errors.password && (
+                    <Text style={styles.errorText}>
+                      {errors.password.message}
+                    </Text>
+                  )}
                 </View>
               )}
             />
-
 
             <TouchableOpacity
               style={styles.button}
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}>
-              <Text style={styles.buttonText}>{isSubmitting ? 'Submitting...' : 'Sign Up'}</Text>
+              <Text style={styles.buttonText}>
+                {isSubmitting ? 'Submitting...' : 'Sign Up'}
+              </Text>
             </TouchableOpacity>
-
             <View style={styles.signupTextContainer}>
               <Text style={styles.signupText}>
                 Already have an account?{' '}

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { globalColors } from '../../styles/globalStyles';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,22 +25,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  input: {
-    width: '80%',
-    height: 50,
+  otpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 20,
+    paddingHorizontal: 20,
+    gap: 5,
+  },
+  otpInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: 'center',
+    borderColor: '#ccc',
+    width: 45,
+    height: 50,
+    borderRadius: 6,
+    fontSize: 24,
+    fontWeight: '600',
     color: '#000',
-    backgroundColor: '#f9f9f9',
   },
   button: {
     width: '80%',
-    backgroundColor: '#007BFF',
+    backgroundColor: globalColors.light_blue,
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -48,6 +53,13 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    marginTop: 15,
+  },
+  secondaryButtonText: {
+    color: globalColors.light_text,
   },
 });
 

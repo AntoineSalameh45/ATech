@@ -19,6 +19,7 @@ import useCartStore from '../../stores/CartStore';
 import {ImageSlider} from '../../components/atoms/ImageSlider';
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import {MailIconBlue, MailIconRed} from '../../assets/svg';
+import RNFetchBlob from 'rn-fetch-blob';
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
@@ -48,7 +49,7 @@ const Details = ({route}: Props) => {
     Alert.alert('Success', 'Item added to cart!');
   };
 
-  const handleLongPressImage = async (imageUrl: string) => {
+  const handleLongPressImage = (imageUrl: string) => {
     Alert.alert(
       'Save Image',
       'Do you want to save this image to your gallery?',
@@ -61,7 +62,7 @@ const Details = ({route}: Props) => {
           text: 'Yes',
           onPress: async () => {
             try {
-              if (Platform.OS === 'android') {
+              if (Platform.OS === 'android' && Platform.Version < 33) {
                 const hasPermission = await PermissionsAndroid.request(
                   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                 );
@@ -75,14 +76,20 @@ const Details = ({route}: Props) => {
                 }
               }
 
-              await CameraRoll.saveAsset(imageUrl, {
-                type: 'photo',
-                album: 'ATech',
-              });
-              Alert.alert('Success', 'Image saved!');
+              const res = await RNFetchBlob.config({
+                fileCache: true,
+                appendExt: 'jpg',
+              }).fetch('GET', imageUrl);
+
+              const imagePath =
+                Platform.OS === 'android' ? 'file://' + res.path() : res.path();
+
+              await CameraRoll.save(imagePath, {type: 'photo', album: 'ATech'});
+
+              Alert.alert('Success', 'Image saved to gallery!');
             } catch (error) {
               Alert.alert('Error', 'Failed to save image.');
-              console.error(error);
+              console.error('Save image error:', error);
             }
           },
         },

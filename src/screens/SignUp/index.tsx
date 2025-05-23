@@ -15,13 +15,16 @@ import {Controller} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
-import styles from './styles';
 import useSignUpForm, {
   SignUpFormInputs,
 } from '../../utils/validation/useSignupForm';
 import {signup} from '../../services/auth';
+import { useTheme } from '../../stores/ThemeContext';
+import getDynamicStyles from './styles';
 
 const SignUp = () => {
+  const {theme} = useTheme();
+  const styles = getDynamicStyles(theme);
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, 'SignUp'>>();
   const {

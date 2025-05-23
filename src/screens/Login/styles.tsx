@@ -1,7 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {globalColors, globalFonts} from '../../styles/globalStyles';
 
-const styles = StyleSheet.create({
+const getDynamicStyles = (theme: 'light' | 'dark') => {
+  const isDark = theme === 'dark';
+
+  return StyleSheet.create({
   keyContainer: {
     flex: 1,
   },
@@ -9,13 +12,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
   },
   title: {
     fontSize: 32,
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: isDark ? globalColors.dark_text : globalColors.light_text,
     fontFamily: 'Rancho-Regular',
   },
   description: {
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: isDark ? globalColors.dark_text : globalColors.light_text,
     fontFamily: globalFonts.secondary_font,
   },
   input: {
@@ -33,8 +36,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     paddingHorizontal: 8,
-    color: '#000',
-    backgroundColor: '#f9f9f9',
+    color: isDark ? globalColors.dark_text : globalColors.light_text,
+    backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
   },
   errorInput: {
     borderColor: 'red',
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButton: {
-    backgroundColor: globalColors.light_blue,
+    backgroundColor: isDark ? globalColors.dark_red : globalColors.light_blue,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -60,16 +63,17 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 11,
-    color: '#333',
+    color: isDark ? globalColors.dark_text : globalColors.light_text,
     textAlign: 'center',
     fontFamily: globalFonts.secondary_font,
   },
   signupLink: {
-    color: globalColors.light_blue,
+    color: isDark ? globalColors.dark_red : globalColors.light_blue,
   },
   disabledButton: {
     opacity: 0.6,
   },
 });
+};
 
-export default styles;
+export default getDynamicStyles;

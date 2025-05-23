@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,23 +10,30 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import styles from './styles';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
-import { loginSchema, LoginFormInputs } from '../../utils/validation/useLoginForm';
+import {useForm, Controller} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
+import {
+  loginSchema,
+  LoginFormInputs,
+} from '../../utils/validation/useLoginForm';
 import useAuthStore from '../../stores/AuthStore/AuthStore';
-import { login } from '../../services/auth';
+import {login} from '../../services/auth';
+import {useTheme} from '../../stores/ThemeContext';
+import getDynamicStyles from './styles';
+import { HeaderRight } from '../../components/atoms/HeaderRight';
 
 const LoginScreen = () => {
+  const {theme, toggleTheme} = useTheme();
+  const styles = getDynamicStyles(theme);
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { setTokens } = useAuthStore();
+  const {setTokens} = useAuthStore();
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
@@ -49,7 +56,9 @@ const LoginScreen = () => {
     } catch (error: any) {
       console.error('Login Error:', error);
       setErrorMessage(
-        error.response?.data?.message || error.message || 'An unexpected error occurred. Please try again.',
+        error.response?.data?.message ||
+          error.message ||
+          'An unexpected error occurred. Please try again.',
       );
     } finally {
       setIsLoading(false);
@@ -59,10 +68,13 @@ const LoginScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.keyContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
+          <View>
+            <HeaderRight theme={theme} toggleTheme={toggleTheme} />
+          </View>
+
           <Text style={styles.title}>Welcome back</Text>
           <Text style={styles.description}>
             Login to browse through all your tech needs
@@ -71,7 +83,7 @@ const LoginScreen = () => {
           <Controller
             control={control}
             name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({field: {onChange, onBlur, value}}) => (
               <View>
                 <TextInput
                   style={[styles.input, errors.email && styles.errorInput]}
@@ -93,7 +105,7 @@ const LoginScreen = () => {
           <Controller
             control={control}
             name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({field: {onChange, onBlur, value}}) => (
               <View>
                 <TextInput
                   style={[styles.input, errors.password && styles.errorInput]}
@@ -106,7 +118,9 @@ const LoginScreen = () => {
                   autoCapitalize="none"
                 />
                 {errors.password && (
-                  <Text style={styles.errorText}>{errors.password.message}</Text>
+                  <Text style={styles.errorText}>
+                    {errors.password.message}
+                  </Text>
                 )}
               </View>
             )}
@@ -119,8 +133,7 @@ const LoginScreen = () => {
           <TouchableOpacity
             style={[styles.loginButton, isLoading && styles.disabledButton]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
-          >
+            disabled={isLoading}>
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -133,8 +146,7 @@ const LoginScreen = () => {
               Don't have an account?{' '}
               <Text
                 style={styles.signupLink}
-                onPress={() => navigation.navigate('SignUp')}
-              >
+                onPress={() => navigation.navigate('SignUp')}>
                 Sign Up
               </Text>
             </Text>

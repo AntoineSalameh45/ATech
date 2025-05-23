@@ -1,15 +1,14 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../RootStackParamList';
-import Home from '../../../screens/Home';
-import Details from '../../../screens/Details';
+import HomeScreen from '../../../screens/Home';
 import {useTheme} from '../../../stores/ThemeContext';
 import {HeaderRight} from '../../../components/atoms/HeaderRight';
 import styles from '../../../components/atoms/HeaderRight/styles';
 import { View } from 'react-native';
 import CameraTest from '../../../screens/CameraTest';
 import { globalFonts } from '../../../styles/globalStyles';
+import ProductStack from '../ProductStack';
 
-const MainStack = createNativeStackNavigator<RootStackParamList>();
+const MainStack = createNativeStackNavigator();
 
 function AuthStack() {
   const {theme, toggleTheme} = useTheme();
@@ -35,22 +34,15 @@ function AuthStack() {
       }}>
       <MainStack.Screen
         name="Home"
-        component={Home}
+        component={HomeScreen}
         options={{
           title: 'ATech',
         }}
       />
       <MainStack.Screen
-        name="Details"
-        component={Details}
-        options={({route}) => ({
-          title: route.params?.title || 'Details',
-          headerTitleStyle: {
-            fontFamily: globalFonts.secondary_bold,
-            fontSize: 22,
-            color: theme === 'light' ? '#000000' : '#ffffff',
-          },
-        })}
+        name="ProductScreen"
+        component={ProductStack}
+        options={{headerShown: false}}
       />
       <MainStack.Screen
         name="Camera"

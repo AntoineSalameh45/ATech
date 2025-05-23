@@ -1,20 +1,20 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../RootStackParamList';
-import CameraTest from '../../../screens/CameraTest';
-import ProfileScreen from '../../../screens/Profile';
 import {useTheme} from '../../../stores/ThemeContext';
 import {View} from 'react-native';
 import {HeaderRight} from '../../../components/atoms/HeaderRight';
 import styles from '../../../components/atoms/HeaderRight/styles';
 import {globalFonts} from '../../../styles/globalStyles';
+import Details from '../../../screens/Details';
+import EditProduct from '../../../screens/EditProduct';
 
-const ProfileStack = createNativeStackNavigator<RootStackParamList>();
+const ProductStack = createNativeStackNavigator<RootStackParamList>();
 
 function ProfileNav() {
   const {theme, toggleTheme} = useTheme();
   return (
-    <ProfileStack.Navigator
-      initialRouteName="Profile"
+    <ProductStack.Navigator
+      initialRouteName="Details"
       screenOptions={{
         headerRight: () => (
           <View style={styles.headerRightContainer}>
@@ -31,14 +31,13 @@ function ProfileNav() {
           color: theme === 'light' ? '#000000' : '#ffffff',
         },
       }}>
-      <ProfileStack.Screen name="Profile" component={ProfileScreen} />
-      <ProfileStack.Screen
-        name="Camera"
-        component={CameraTest}
+      <ProductStack.Screen name="Details" component={Details} />
+      <ProductStack.Screen
+        name="EditProduct"
+        component={EditProduct}
         options={{headerShown: false}}
-        initialParams={{onPhotoTaken: () => {}}}
       />
-    </ProfileStack.Navigator>
+    </ProductStack.Navigator>
   );
 }
 

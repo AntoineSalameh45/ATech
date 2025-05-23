@@ -22,6 +22,7 @@ import api from '../../services/api';
 import {globalStyles} from '../../styles/globalStyles';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SectionHeader} from '../../components/atoms/SectionHeader';
+import { BASE_URL } from '@env';
 
 type AuthStackParamList = {
   Camera: {onPhotoTaken: (photoUri: string) => void};
@@ -89,6 +90,7 @@ const ProfileScreen = () => {
       setLoadingProducts(false);
     }
   };
+
   const onRefresh = async () => {
     setRefreshing(true);
     if (profile?.id) {
@@ -255,7 +257,9 @@ const ProfileScreen = () => {
               photoUri
                 ? {uri: photoUri}
                 : profile?.profileImage?.url
-                ? {uri: profile.profileImage.url}
+                ? {
+                    uri: `${BASE_URL}${profile.profileImage.url}`,
+                  }
                 : require('../../assets/profile-placeholder.png')
             }
             style={[

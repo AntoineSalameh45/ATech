@@ -1,5 +1,5 @@
 import {StyleSheet, Dimensions} from 'react-native';
-import {globalFonts} from '../../styles/globalStyles';
+import {globalColors, globalFonts} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -145,6 +145,23 @@ export const getDynamicStyles = (theme: string) => {
       marginLeft: 8,
       fontSize: 16,
       color: theme === 'dark' ? '#fff' : '#000',
+    },
+    ownerActionsContainer: {
+      marginTop: 20,
+      padding: 10,
+      backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
+      borderRadius: 10,
+    },
+    editButton: {
+      padding: 10,
+      backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
+      borderRadius: 5,
+      alignItems: 'center',
+    },
+    editButtonText: {
+      color: isDark ? '#FF5722' : '#03A9F4',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   });
 };

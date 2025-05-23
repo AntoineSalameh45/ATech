@@ -12,7 +12,17 @@ export type RootStackParamList = {
     images: {url: string}[];
     latitude: number;
     longitude: number;
-    user: {email: string};
+    user: {email: string, id: string};
+    locationName: string;
+  };
+  EditProduct: {
+    productId: string;
+    title: string;
+    description: string;
+    price: number;
+    images: { url: string }[];
+    latitude: number;
+    longitude: number;
     locationName: string;
   };
   Profile: {

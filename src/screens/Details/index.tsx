@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   PermissionsAndroid,
   Platform,
 } from 'react-native';
-import {RouteProp} from '@react-navigation/native';
+import {RouteProp, useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
@@ -20,6 +20,18 @@ import {ImageSlider} from '../../components/atoms/ImageSlider';
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import {MailIconBlue, MailIconRed} from '../../assets/svg';
 import RNFetchBlob from 'rn-fetch-blob';
+import api from '../../services/api';
+
+const fetchCurrentUser = async () => {
+  try {
+    const response = await api.get('/api/user/profile');
+    console.log(response.data.data.user);
+    return response.data.data.user;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    return null;
+  }
+};
 
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
@@ -28,11 +40,37 @@ type Props = {
 };
 
 const Details = ({route}: Props) => {
-  const {title, description, price, images, latitude, longitude, _id, user, locationName} =
-    route.params;
+  const {
+    title,
+    description,
+    price,
+    images,
+    latitude,
+    longitude,
+    _id,
+    user: productOwner,
+    locationName,
+  } = route.params;
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
   const {addItem} = useCartStore();
+  const navigation = useNavigation();
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        if (user) {
+          setCurrentUserEmail(user.email);
+          console.log('Fetched user email:', user.email);
+        }
+      } catch (error) {
+        console.error('Error setting user email:', error);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   const formattedImages = images?.map((img: {url: string}) => ({
     url: `${BASE_URL}${img.url}`,
@@ -49,56 +87,49 @@ const Details = ({route}: Props) => {
     Alert.alert('Success', 'Item added to cart!');
   };
 
-  const handleLongPressImage = (imageUrl: string) => {
-    Alert.alert(
-      'Save Image',
-      'Do you want to save this image to your gallery?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: async () => {
-            try {
-              if (Platform.OS === 'android' && Platform.Version < 33) {
-                const hasPermission = await PermissionsAndroid.request(
-                  PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                );
+  const handleLongPressImage = async (imageUrl: string) => {
+    try {
+      if (Platform.OS === 'android') {
+        const writePermission =
+          Platform.Version >= 33
+            ? await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+              )
+            : await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              );
 
-                if (hasPermission !== PermissionsAndroid.RESULTS.GRANTED) {
-                  Alert.alert(
-                    'Permission Denied',
-                    'Storage permission is required to save images.',
-                  );
-                  return;
-                }
-              }
+        if (writePermission !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save images.',
+          );
+          return;
+        }
+      }
 
-              const res = await RNFetchBlob.config({
-                fileCache: true,
-                appendExt: 'jpg',
-              }).fetch('GET', imageUrl);
+      const res = await RNFetchBlob.config({
+        fileCache: true,
+        appendExt: 'jpg',
+      }).fetch('GET', imageUrl);
 
-              const imagePath =
-                Platform.OS === 'android' ? 'file://' + res.path() : res.path();
+      const imagePath =
+        Platform.OS === 'android' ? 'file://' + res.path() : res.path();
 
-              await CameraRoll.saveAsset(imagePath, {type: 'photo', album: 'ATech'});
+      await CameraRoll.save(imagePath, {
+        type: 'photo',
+        album: 'ATech',
+      });
 
-              Alert.alert('Success', 'Image saved to gallery!');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to save image.');
-              console.error('Save image error:', error);
-            }
-          },
-        },
-      ],
-    );
+      Alert.alert('Success', 'Image saved to gallery!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save image.');
+      console.error('Save image error:', error);
+    }
   };
 
   const handleContactOwner = () => {
-    const email = user?.email;
+    const email = productOwner?.email;
     if (!email) {
       Alert.alert('Error', 'Owner email is not available.');
       return;
@@ -124,13 +155,36 @@ const Details = ({route}: Props) => {
       });
   };
 
+  const isProductOwner = currentUserEmail === productOwner?.email;
+  console.log({currentUserEmail, productOwner});
+
+  const handleEditProduct = () => {
+    if (!isProductOwner) {
+      Alert.alert(
+        'Unauthorized',
+        'You are not authorized to edit this product.',
+      );
+      return;
+    }
+
+    navigation.navigate('EditProduct', {
+      productId: _id,
+      title,
+      description,
+      price,
+      images,
+      latitude,
+      longitude,
+      locationName,
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageSlider
         images={formattedImages}
         onImageLongPress={image => {
           const imageUrl = `${image}`;
-          console.log('Long-pressed image URL:', imageUrl);
           handleLongPressImage(imageUrl);
         }}
       />
@@ -143,6 +197,16 @@ const Details = ({route}: Props) => {
         <Text style={styles.priceLabel}>Description:</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
+
+      {isProductOwner && (
+        <View style={styles.ownerActionsContainer}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={handleEditProduct}>
+            <Text style={styles.editButtonText}>Edit Product</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
@@ -151,6 +215,7 @@ const Details = ({route}: Props) => {
           <Text style={styles.shareButtonText}>Share</Text>
         </TouchableOpacity>
       </View>
+
       <View style={styles.iconTextContainer}>
         <TouchableOpacity
           style={styles.contactOwnerButton}

@@ -103,20 +103,23 @@ const HomeScreen = () => {
     setRefreshing(false);
   }, [loadProducts, searchQuery]);
 
-  const navigateToDetails = (item: iProduct) => {
-    const params: DetailsScreenParams = {
-      _id: item._id,
-      title: item.title,
-      description: item.description,
-      price: item.price,
-      images: item.images,
-      latitude: item.location.latitude,
-      longitude: item.location.longitude,
-      user: item.user,
-      locationName: item.location.name,
-    };
-    navigation.navigate('Details', params);
+ const navigateToDetails = (item: iProduct) => {
+  const params: DetailsScreenParams = {
+    _id: item._id,
+    title: item.title,
+    description: item.description,
+    price: item.price,
+    images: item.images,
+    latitude: item.location.latitude,
+    longitude: item.location.longitude,
+    user: item.user,
+    locationName: item.location.name,
   };
+  navigation.navigate('ProductScreen', {
+    screen: 'Details',
+    params,
+  });
+};
 
   const getSortedProducts = () => {
     if (sortOption === 'asc') {
@@ -125,7 +128,7 @@ const HomeScreen = () => {
     if (sortOption === 'desc') {
       return [...products].sort((a, b) => b.price - a.price);
     }
-    return products; // Default order from API
+    return products;
   };
 
   return (

@@ -22,9 +22,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
       width: 100,
       height: 100,
       borderRadius: 50,
-      backgroundColor: isDark ? '#333' : '#ddd',
-      borderWidth: 1,
-      borderColor: isDark ? '#444' : '#000',
+      resizeMode: 'cover',
     },
     details: {
       flex: 1,

@@ -30,18 +30,17 @@ import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
 
 const hasAndroidPermission = async () => {
-  if (Platform.OS !== 'android') {return true;}
+  if (Platform.OS !== 'android') {
+    return true;
+  }
 
   if (Platform.Version >= 33) {
     const statuses = await PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-      PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
     ]);
     return (
       statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
-        PermissionsAndroid.RESULTS.GRANTED &&
-      statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ===
-        PermissionsAndroid.RESULTS.GRANTED
+      PermissionsAndroid.RESULTS.GRANTED
     );
   } else {
     const status = await PermissionsAndroid.request(
@@ -54,7 +53,8 @@ const hasAndroidPermission = async () => {
 const saveToGallery = async (
   uri: string,
   setImageUri: React.Dispatch<React.SetStateAction<string>>,
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  onPhotoTaken?: (photoUri: string) => void,
 ) => {
   try {
     if (Platform.OS === 'android' && !(await hasAndroidPermission())) {
@@ -74,14 +74,21 @@ const saveToGallery = async (
     Alert.alert('Photo Saved', 'Your photo has been saved successfully.');
     setImageUri('');
     setIsOpen(false);
+
+    if (onPhotoTaken) {
+      onPhotoTaken(uri);
+    }
   } catch (error) {
     console.error('Error saving photo:', error);
     Alert.alert('Error', 'Failed to save the photo. Please try again.');
   }
 };
 
-
-const CameraTest = () => {
+const CameraTest = ({
+  onPhotoTaken,
+}: {
+  onPhotoTaken: (photoUri: string) => void;
+}) => {
   const {hasPermission, requestPermission} = useCameraPermission();
   const [cameraDevice, setCameraDevice] = useState<'back' | 'front'>('back');
   const device = useCameraDevice(cameraDevice);
@@ -106,6 +113,7 @@ const CameraTest = () => {
       const uri = `file://${photo?.path}`;
       setImageUri(uri);
       setIsOpen(false);
+      onPhotoTaken(uri);
     } catch (error) {
       console.error('Error capturing photo:', error);
       Alert.alert('Error', 'Failed to capture the photo.');
@@ -150,10 +158,13 @@ const CameraTest = () => {
           <Image source={{uri: imageUri}} style={styles.imageContainer} />
           <View style={styles.postPhotoButtonContainer}>
             <Pressable
-              onPress={() => saveToGallery(imageUri, setImageUri, setIsOpen)}
+              onPress={() =>
+                saveToGallery(imageUri, setImageUri, setIsOpen, onPhotoTaken)
+              }
               style={styles.saveButton}>
               <SaveIcon height={26} width={26} />
             </Pressable>
+
             <Pressable onPress={handleRetake} style={styles.saveButton}>
               <RetakeIcon height={26} width={26} />
             </Pressable>

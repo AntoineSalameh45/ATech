@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 import {globalFonts} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -16,18 +16,6 @@ export const getDynamicStyles = (theme: string) => {
       flexGrow: 1,
       padding: 16,
       backgroundColor: isDark ? '#121212' : '#F0F8FF',
-    },
-    image: {
-      width: '100%',
-      height: scale(250),
-      borderRadius: scale(10),
-      marginBottom: scale(20),
-      borderWidth: PixelRatio.getPixelSizeForLayoutSize(1.5),
-      borderColor: saberGlow,
-      shadowColor: saberGlow,
-      shadowOpacity: 0.8,
-      shadowRadius: scale(12),
-      elevation: 8,
     },
     title: {
       fontSize: scale(26),
@@ -94,7 +82,7 @@ export const getDynamicStyles = (theme: string) => {
     },
     button: {
       backgroundColor: isDark ? '#D32F2F' : '#0288D1',
-      width: '80%',
+      width: '70%',
       height: scale(50),
       justifyContent: 'center',
       alignItems: 'center',

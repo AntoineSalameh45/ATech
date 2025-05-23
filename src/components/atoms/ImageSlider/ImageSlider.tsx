@@ -37,7 +37,7 @@ const ImageSlider = ({images, onImageLongPress}: ImageSliderProps) => {
             <Image
               source={{uri: item.url}}
               style={styles.image}
-              resizeMode="cover"
+              resizeMode="contain"
             />
           </TouchableWithoutFeedback>
         )}

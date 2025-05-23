@@ -119,7 +119,7 @@ export const getDynamicStyles = (theme: string) => {
       textShadowRadius: scale(6),
     },
     emptyStateContainer: {
-      flex: 1,
+      flex: 0.7,
       justifyContent: 'center',
       alignItems: 'center',
     },

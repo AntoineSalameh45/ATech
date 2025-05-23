@@ -15,11 +15,9 @@ export interface iAuthState {
 
 const SecureStorage: StateStorage = {
   setItem: async (name, value) => {
-    console.log(`[SecureStorage] Setting item: ${name}`);
     await RNSecureStorage.setItem(name, value, {
       accessible: ACCESSIBLE.WHEN_UNLOCKED,
     });
-    console.log(`[SecureStorage] Successfully set item: ${name}`);
   },
 
   getItem: async name => {
@@ -31,7 +29,6 @@ const SecureStorage: StateStorage = {
         error.message.includes('Value for') &&
         error.message.includes('does not exist')
       ) {
-        console.log(`[SecureStorage] Item ${name} not found, returning null.`);
         return null;
       }
       console.error(
@@ -55,17 +52,14 @@ const useAuthStore = create<iAuthState>()(
       isAuthenticated: false,
 
       setTokens: (accessToken, refreshToken) => {
-        console.log('[AuthStore] Setting tokens:', {accessToken, refreshToken});
         set({accessToken, refreshToken, isAuthenticated: !!accessToken});
       },
 
       clearTokens: () => {
-        console.log('[AuthStore] Clearing tokens.');
         set({accessToken: null, refreshToken: null, isAuthenticated: false});
       },
 
       setAuthenticated: value => {
-        console.log(`[AuthStore] Setting authentication status: ${value}`);
         set({isAuthenticated: value});
       },
 
@@ -78,9 +72,7 @@ const useAuthStore = create<iAuthState>()(
         }
 
         try {
-          console.log('[AuthStore] Requesting new tokens with refresh token.');
           const response = await refreshTokenreq(refreshToken);
-          console.log('[AuthStore] Refresh token response:', response);
 
           const {accessToken, refreshToken: newRefreshToken} = response;
 
@@ -89,7 +81,6 @@ const useAuthStore = create<iAuthState>()(
           }
 
           set({accessToken, refreshToken: newRefreshToken});
-          console.log('[AuthStore] Access token refreshed.');
           return accessToken;
         } catch (error: any) {
           console.error('[AuthStore] Failed to refresh access token:', error);

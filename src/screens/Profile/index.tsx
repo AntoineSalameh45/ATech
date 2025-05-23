@@ -20,6 +20,8 @@ import {CustomModal} from '../../components/molecules/CustomModal';
 import {AuthStore} from '../../stores/AuthStore';
 import api from '../../services/api';
 import {globalStyles} from '../../styles/globalStyles';
+import ProductList from '../../components/organisims/ProductList/ProductList';
+import {SectionHeader} from '../../components/atoms/SectionHeader';
 
 type AuthStackParamList = {
   Camera: {onPhotoTaken: (photoUri: string) => void};
@@ -43,10 +45,14 @@ const ProfileScreen = () => {
   const clearTokens = AuthStore(state => state.clearTokens);
 
   const [profile, setProfile] = useState<{
+    id?: string;
     firstName: string;
     lastName: string;
     profileImage?: {url: string};
   } | null>(null);
+
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +60,7 @@ const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchProfile = async () => {
     setIsLoading(true);
@@ -69,9 +76,36 @@ const ProfileScreen = () => {
     }
   };
 
+  const fetchUserProducts = async (userId: string) => {
+    setLoadingProducts(true);
+    try {
+      const response = await api.get('/api/products');
+      const allProducts = response.data.data.products;
+      const userProducts = allProducts.filter((p: any) => p.userId === userId);
+      setProducts(userProducts);
+    } catch (err: any) {
+      console.warn('Failed to fetch products:', err);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (profile?.id) {
+      await fetchUserProducts(profile.id);
+    }
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    if (profile?.id) {
+      fetchUserProducts(profile.id);
+    }
+  }, [profile?.id]);
 
   const handleSave = async () => {
     if (!profile || !profile.firstName.trim() || !profile.lastName.trim()) {
@@ -116,6 +150,10 @@ const ProfileScreen = () => {
       setPhotoUri(null);
       setIsEditing(false);
       Alert.alert('Success', 'Profile updated successfully');
+
+      if (response.data.data.user.id) {
+        fetchUserProducts(response.data.data.user.id);
+      }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message || 'Failed to update profile';
@@ -222,7 +260,7 @@ const ProfileScreen = () => {
             }
             style={[
               styles.profileImage,
-              !isEditing && {opacity: 0.6},
+              !isEditing && styles.profileImageDisabled,
             ]}
           />
         </TouchableOpacity>
@@ -235,12 +273,14 @@ const ProfileScreen = () => {
                 value={profile.firstName}
                 onChangeText={text => setProfile({...profile, firstName: text})}
                 placeholder="First Name"
+                placeholderTextColor={theme === 'dark' ? '#ccc' : '#666'}
               />
               <TextInput
-                style={[styles.nameInput, {marginTop: 10}]}
+                style={styles.nameInputMarginTop}
                 value={profile.lastName}
                 onChangeText={text => setProfile({...profile, lastName: text})}
                 placeholder="Last Name"
+                placeholderTextColor={theme === 'dark' ? '#ccc' : '#666'}
               />
             </>
           ) : (
@@ -283,6 +323,42 @@ const ProfileScreen = () => {
             <Text style={globalDynamicStyles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
+      )}
+      <SectionHeader title="Your Products" theme={theme} />
+
+      {loadingProducts && !refreshing ? (
+        <View style={styles.loadingProductsContainer}>
+          <ActivityIndicator size="small" color={styles.productPrice.color} />
+        </View>
+      ) : (
+        <ProductList
+          products={products}
+          onProductPress={item => {
+            Alert.alert('Product Selected', `You selected: ${item.title}`);
+          }}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          styles={{
+            listContainer: styles.productListContainer,
+            productContainer: styles.productContainer,
+            productImage: styles.productImage,
+            productDetails: styles.productDetails,
+            productTitle: styles.productTitle,
+            productPrice: styles.productPrice,
+          }}
+          ListEmptyComponent={
+            <View style={styles.noProductsContainer}>
+              <Text style={styles.noProductsText}>
+                No products found for this user.
+              </Text>
+              <Text style={styles.pullToRefreshText}>
+                (Pull down to refresh)
+              </Text>
+            </View>
+          }
+          onEndReached={() => {}}
+          isFetchingMore={false}
+        />
       )}
     </View>
   );

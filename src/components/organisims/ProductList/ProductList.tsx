@@ -19,6 +19,7 @@ const ProductList = ({
   onRefresh,
   onEndReached,
   isFetchingMore,
+  ListEmptyComponent,
 }: any) => {
   const renderItem = ({item}: any) => (
     <TouchableOpacity
@@ -43,10 +44,7 @@ const ProductList = ({
   const renderFooter = () =>
     isFetchingMore ? (
       <View style={{paddingVertical: 16}}>
-        <ActivityIndicator
-          size="small"
-          color={globalColors.light_blue}
-        />
+        <ActivityIndicator size="small" color={globalColors.light_blue} />
       </View>
     ) : null;
 
@@ -63,6 +61,7 @@ const ProductList = ({
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
       ListFooterComponent={renderFooter}
+      ListEmptyComponent={ListEmptyComponent}
     />
   );
 };

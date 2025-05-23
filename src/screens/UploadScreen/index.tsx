@@ -259,11 +259,29 @@ const UploadProductScreen = () => {
 
         <View style={styles.imagesContainer}>
           {images.map((img, idx) => (
-            <Image
-              key={idx}
-              source={{uri: img.uri}}
-              style={styles.imageThumb}
-            />
+            <View key={idx} style={styles.imageWrapper}>
+              <Image source={{uri: img.uri}} style={styles.imageThumb} />
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => {
+                  Alert.alert(
+                    'Remove Image',
+                    'Are you sure you want to remove this image?',
+                    [
+                      {text: 'Cancel', style: 'cancel'},
+                      {
+                        text: 'Remove',
+                        onPress: () =>
+                          setImages(prevImages =>
+                            prevImages.filter((_, imageIdx) => imageIdx !== idx),
+                          ),
+                      },
+                    ],
+                  );
+                }}>
+                <Text style={styles.removeButtonText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
 

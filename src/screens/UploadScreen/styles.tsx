@@ -1,7 +1,7 @@
-import { StyleSheet, Dimensions } from 'react-native';
-import { globalColors } from '../../styles/globalStyles';
+import {StyleSheet, Dimensions} from 'react-native';
+import {globalColors} from '../../styles/globalStyles';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
 
 const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
@@ -9,7 +9,9 @@ const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
 export const getDynamicStyles = (theme: 'light' | 'dark') => {
   const isLight = theme === 'light';
 
-  const primaryColor = isLight ? globalColors.light_blue : globalColors.dark_red;
+  const primaryColor = isLight
+    ? globalColors.light_blue
+    : globalColors.dark_red;
   const dangerColor = isLight ? '#dc3545' : '#ff6b6b';
   const background = isLight ? '#fff' : '#121212';
   const inputBackground = isLight ? '#f9f9f9' : '#222';
@@ -89,6 +91,24 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       paddingVertical: scale(14),
       borderRadius: scale(6),
       alignItems: 'center',
+    },
+    imageWrapper: {
+      position: 'relative',
+      marginBottom: 8,
+    },
+    removeButton: {
+      position: 'absolute',
+      top: -5,
+      right: -5,
+      backgroundColor: 'red',
+      padding: 4,
+      borderRadius: 15,
+      zIndex: 1,
+    },
+    removeButtonText: {
+      color: 'white',
+      fontSize: 12,
+      fontWeight: 'bold',
     },
   });
 };

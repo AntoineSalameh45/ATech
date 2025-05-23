@@ -247,9 +247,9 @@ const Details = ({route}: Props) => {
             <Text style={styles.editButtonText}>Edit Product</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.editButton}
+            style={styles.deleteButton}
             onPress={handleDeleteProduct}>
-            <Text style={styles.editButtonText}>Delete Product</Text>
+            <Text style={styles.deleteButtonText}>Delete Product</Text>
           </TouchableOpacity>
         </View>
       )}

@@ -148,9 +148,10 @@ export const getDynamicStyles = (theme: string) => {
     },
     ownerActionsContainer: {
       marginTop: 20,
-      padding: 10,
       backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
       borderRadius: 10,
+      flexDirection: 'column',
+      gap: 5,
     },
     editButton: {
       padding: 10,
@@ -160,6 +161,17 @@ export const getDynamicStyles = (theme: string) => {
     },
     editButtonText: {
       color: isDark ? '#FF5722' : '#03A9F4',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    deleteButton: {
+      padding: 10,
+      backgroundColor: globalColors.dark_red,
+      borderRadius: 5,
+      alignItems: 'center',
+    },
+    deleteButtonText: {
+      color: '#fff',
       fontSize: 16,
       fontWeight: 'bold',
     },

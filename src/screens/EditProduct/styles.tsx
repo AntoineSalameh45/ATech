@@ -20,7 +20,8 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
     textShadowRadius: 1,
   },
   container: {
-    marginBottom: 24,
+    flex: 1,
+    backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
   },
   label: {
     fontSize: 16,
@@ -36,6 +37,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
     fontSize: 16,
     marginBottom: 16,
     backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
+    color: isDark ? globalColors.dark_text : globalColors.light_text,
   },
   saveButton: {
     backgroundColor: isDark ? globalColors.dark_red : globalColors.light_blue,
@@ -47,7 +49,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
   saveButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: isDark ? globalColors.dark_text : globalColors.light_text,
+    color: isDark ? globalColors.light_text : globalColors.dark_text,
   },
 });
 };

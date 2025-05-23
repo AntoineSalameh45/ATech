@@ -48,7 +48,8 @@ export type DetailsScreenParams = {
   description: string;
   price: number;
   images: iProductImage[];
+  user: iProductUser;
   latitude: number;
   longitude: number;
-  user: iProductUser;
+  locationName: string;
 };

@@ -1,5 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useNavigation} from '@react-navigation/native';
 import type {CompositeNavigationProp} from '@react-navigation/native';
@@ -33,25 +42,26 @@ const ProfileScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const clearTokens = AuthStore(state => state.clearTokens);
 
-  const [profile, setProfile] = useState<any>(null);
-  const [savedName, setSavedName] = useState('John Doe');
+  const [profile, setProfile] = useState<{
+    firstName: string;
+    lastName: string;
+    profileImage?: {url: string};
+  } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchProfile = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const endpoint = 'api/user/profile';
-      const response = await api.get(endpoint);
+      const response = await api.get('api/user/profile');
       setProfile(response.data.data.user);
-      setSavedName(
-        `${response.data.data.user.firstName} ${response.data.data.user.lastName}`,
-      );
+      setPhotoUri(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch profile');
     } finally {
@@ -63,11 +73,57 @@ const ProfileScreen = () => {
     fetchProfile();
   }, []);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    setSavedName(
-      profile ? profile.firstName + ' ' + profile.lastName : savedName,
-    );
+  const handleSave = async () => {
+    if (!profile || !profile.firstName.trim() || !profile.lastName.trim()) {
+      Alert.alert('Error', 'First Name and Last Name cannot be empty.');
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+
+      formData.append('firstName', profile.firstName);
+      formData.append('lastName', profile.lastName);
+
+      if (photoUri && !photoUri.startsWith('http')) {
+        let uploadUri = photoUri;
+        if (Platform.OS === 'ios' && !uploadUri.startsWith('file://')) {
+          uploadUri = 'file://' + uploadUri;
+        }
+
+        const filename =
+          uploadUri.split('/').pop() || `photo_${Date.now()}.jpg`;
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1].toLowerCase()}` : 'image/jpeg';
+
+        formData.append('profileImage', {
+          uri: uploadUri,
+          type,
+          name: filename,
+        } as any);
+      }
+
+      const response = await api.put('api/user/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setProfile(response.data.data.user);
+      setPhotoUri(null);
+      setIsEditing(false);
+      Alert.alert('Success', 'Profile updated successfully');
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || 'Failed to update profile';
+      setError(errorMessage);
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = () => {
@@ -75,10 +131,26 @@ const ProfileScreen = () => {
     setLogoutModalVisible(false);
     console.log('User logged out!');
   };
+
   if (isLoading) {
     return (
       <View style={globalDynamicStyles.centeredView}>
         <Text style={styles.nameText}>Loading profile...</Text>
+      </View>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <View style={globalDynamicStyles.centeredView}>
+        <Text style={globalDynamicStyles.errorText}>
+          Profile data not available.
+        </Text>
+        <TouchableOpacity
+          style={globalDynamicStyles.retryButton}
+          onPress={fetchProfile}>
+          <Text style={globalDynamicStyles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -137,7 +209,9 @@ const ProfileScreen = () => {
       />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          onPress={() => isEditing && setModalVisible(true)}
+          disabled={!isEditing}>
           <Image
             source={
               photoUri
@@ -146,28 +220,32 @@ const ProfileScreen = () => {
                 ? {uri: profile.profileImage.url}
                 : require('../../assets/profile-placeholder.png')
             }
-            style={styles.profileImage}
+            style={[
+              styles.profileImage,
+              !isEditing && {opacity: 0.6},
+            ]}
           />
         </TouchableOpacity>
+
         <View style={styles.details}>
           {isEditing ? (
-            <TextInput
-              style={styles.nameInput}
-              value={
-                profile ? `${profile.firstName} ${profile.lastName}` : savedName
-              }
-              onChangeText={text => {
-                const [firstName, lastName] = text.split(' ');
-                if (profile) {
-                  setProfile({...profile, firstName, lastName});
-                } else {
-                  setSavedName(text);
-                }
-              }}
-            />
+            <>
+              <TextInput
+                style={styles.nameInput}
+                value={profile.firstName}
+                onChangeText={text => setProfile({...profile, firstName: text})}
+                placeholder="First Name"
+              />
+              <TextInput
+                style={[styles.nameInput, {marginTop: 10}]}
+                value={profile.lastName}
+                onChangeText={text => setProfile({...profile, lastName: text})}
+                placeholder="Last Name"
+              />
+            </>
           ) : (
             <Text style={styles.nameText}>
-              {profile ? `${profile.firstName} ${profile.lastName}` : savedName}
+              {profile.firstName} {profile.lastName}
             </Text>
           )}
         </View>
@@ -176,10 +254,15 @@ const ProfileScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.editButton}
-          onPress={isEditing ? handleSave : () => setIsEditing(true)}>
-          <Text style={styles.editButtonText}>
-            {isEditing ? 'Save' : 'Edit'}
-          </Text>
+          onPress={isEditing ? handleSave : () => setIsEditing(true)}
+          disabled={isSaving}>
+          {isSaving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.editButtonText}>
+              {isEditing ? 'Save' : 'Edit'}
+            </Text>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutButton}

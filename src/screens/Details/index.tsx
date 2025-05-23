@@ -28,7 +28,7 @@ type Props = {
 };
 
 const Details = ({route}: Props) => {
-  const {title, description, price, images, latitude, longitude, _id, user} =
+  const {title, description, price, images, latitude, longitude, _id, user, locationName} =
     route.params;
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
@@ -84,7 +84,7 @@ const Details = ({route}: Props) => {
               const imagePath =
                 Platform.OS === 'android' ? 'file://' + res.path() : res.path();
 
-              await CameraRoll.save(imagePath, {type: 'photo', album: 'ATech'});
+              await CameraRoll.saveAsset(imagePath, {type: 'photo', album: 'ATech'});
 
               Alert.alert('Success', 'Image saved to gallery!');
             } catch (error) {
@@ -181,8 +181,7 @@ const Details = ({route}: Props) => {
               latitude: latitude || 33.8886,
               longitude: longitude || 35.4955,
             }}
-            title={title}
-            description={description}
+            title={locationName}
           />
         </MapView>
       </View>

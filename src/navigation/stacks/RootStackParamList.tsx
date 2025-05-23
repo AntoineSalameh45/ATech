@@ -13,6 +13,7 @@ export type RootStackParamList = {
     latitude: number;
     longitude: number;
     user: {email: string};
+    locationName: string;
   };
   Profile: {
     name: string;

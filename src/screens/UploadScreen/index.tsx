@@ -135,40 +135,31 @@ const UploadProductScreen = () => {
       formData.append('description', data.description);
       formData.append('price', String(parseFloat(data.price)));
 
-      // Parse location or use default
-      let locationObj;
-      try {
-        locationObj = data.location
-          ? JSON.parse(data.location)
-          : DEFAULT_LOCATION;
-      } catch {
-        locationObj = DEFAULT_LOCATION;
-      }
+      const locationObj = data.location
+        ? JSON.parse(data.location)
+        : DEFAULT_LOCATION;
       formData.append('location', JSON.stringify(locationObj));
 
-      // Add images
       images.forEach(image => {
         formData.append('images', {
           uri: image.uri,
           name: image.name,
           type: image.type,
-        } as any); // `as any` is required to suppress TS error
+        } as any);
       });
 
-      // API Request
       const response = await api.post('/api/products', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
 
-      // Handle response
-      if (response.data.success) {
+      if (response.data) {
         Alert.alert('Success', 'Product uploaded successfully!');
         setImages([]);
       } else {
-        throw new Error(response.data.message || 'Upload failed');
+        throw new Error('Unexpected response format');
       }
     } catch (error: any) {
       console.error(error);
@@ -216,7 +207,7 @@ const UploadProductScreen = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              style={[styles.input, errors.title && {borderColor: 'red'}]}
+              style={[styles.input, errors.description && {borderColor: 'red'}]}
             />
           )}
         />
@@ -236,7 +227,7 @@ const UploadProductScreen = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              style={[styles.input, errors.title && {borderColor: 'red'}]}
+              style={[styles.input, errors.price && {borderColor: 'red'}]}
             />
           )}
         />
@@ -257,7 +248,7 @@ const UploadProductScreen = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              style={[styles.input, errors.title && {borderColor: 'red'}]}
+              style={[styles.input, errors.location && {borderColor: 'red'}]}
             />
           )}
         />
@@ -321,7 +312,7 @@ const UploadProductScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowCamera(false)}>
         <CameraTest
-          onCapture={uri => onCaptureFromCamera(uri)}
+          onPhotoTaken={uri => onCaptureFromCamera(uri)}
           onCancel={() => setShowCamera(false)}
         />
       </Modal>

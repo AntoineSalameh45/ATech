@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -31,6 +32,9 @@ const HomeScreen = () => {
   const [page, setPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState<'default' | 'asc' | 'desc'>(
+    'default',
+  );
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadProducts = useCallback(async (pageNumber = 1, query = '') => {
@@ -113,12 +117,54 @@ const HomeScreen = () => {
     navigation.navigate('Details', params);
   };
 
+  const getSortedProducts = () => {
+    if (sortOption === 'asc') {
+      return [...products].sort((a, b) => a.price - b.price);
+    }
+    if (sortOption === 'desc') {
+      return [...products].sort((a, b) => b.price - a.price);
+    }
+    return products; // Default order from API
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.viewContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
       <SearchBar onSearch={onSearch} />
+      <View style={styles.sortOptionsContainer}>
+        <Text style={styles.sortLabel}>Sort by:</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.sortButtonsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.sortButton,
+              sortOption === 'default' && styles.selectedSortButton,
+            ]}
+            onPress={() => setSortOption('default')}>
+            <Text style={styles.sortButtonText}>Default</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sortButton,
+              sortOption === 'asc' && styles.selectedSortButton,
+            ]}
+            onPress={() => setSortOption('asc')}>
+            <Text style={styles.sortButtonText}>Price: Low to High</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sortButton,
+              sortOption === 'desc' && styles.selectedSortButton,
+            ]}
+            onPress={() => setSortOption('desc')}>
+            <Text style={styles.sortButtonText}>Price: High to Low</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
       {isLoading ? (
         <View style={globalDynamicStyles.centeredView}>
           <ActivityIndicator size="large" color={globalColors.light_blue} />
@@ -153,7 +199,7 @@ const HomeScreen = () => {
         </View>
       ) : (
         <ProductList
-          products={products}
+          products={getSortedProducts()}
           onProductPress={navigateToDetails}
           refreshing={refreshing}
           onRefresh={onRefresh}

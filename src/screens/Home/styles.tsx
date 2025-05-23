@@ -1,5 +1,5 @@
 import {StyleSheet, Dimensions, PixelRatio} from 'react-native';
-import {globalFonts} from '../../styles/globalStyles';
+import {globalColors, globalFonts} from '../../styles/globalStyles';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const BASE_WIDTH = 375;
@@ -61,6 +61,52 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       fontSize: scale(16),
       fontFamily: globalFonts.price_tag,
       color: primaryColor,
+    },
+
+    sortOptionsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginVertical: 10,
+      paddingHorizontal: 16,
+    },
+    sortLabel: {
+      fontSize: 16,
+      color: isLight ? globalColors.light_text : globalColors.dark_text,
+      fontWeight: 'bold',
+    },
+    sortButtonsContainer: {
+      flexDirection: 'row',
+      gap: 10,
+      paddingHorizontal: 8,
+    },
+    sortButtons: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    sortButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: isLight ? globalColors.light_blue : globalColors.dark_red,
+      backgroundColor: isLight
+        ? globalColors.light_background
+        : globalColors.dark_background,
+    },
+    selectedSortButton: {
+      borderColor: 'transparent',
+      backgroundColor: isLight
+        ? globalColors.light_blue
+        : globalColors.dark_red,
+    },
+    sortButtonText: {
+      fontSize: 14,
+      color: isLight ? globalColors.light_text : globalColors.dark_text,
+      fontWeight: '600',
+    },
+    selectedSortButtonText: {
+      color: isLight ? globalColors.light_text : globalColors.dark_text,
     },
   });
 };

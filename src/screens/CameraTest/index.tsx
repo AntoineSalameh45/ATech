@@ -29,6 +29,11 @@ import {
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
 
+export interface iCameraTestProps {
+  onPhotoTaken?: (photoUri: string) => void;
+  onCancel: () => void;
+}
+
 const hasAndroidPermission = async () => {
   if (Platform.OS !== 'android') {
     return true;
@@ -65,7 +70,7 @@ const saveToGallery = async (
       return;
     }
 
-    const asset = await CameraRoll.save(uri, {
+    const asset = await CameraRoll.saveAsset(uri, {
       type: 'photo',
       album: 'Captured Photos',
     });
@@ -84,11 +89,7 @@ const saveToGallery = async (
   }
 };
 
-const CameraTest = ({
-  onPhotoTaken,
-}: {
-  onPhotoTaken: (photoUri: string) => void;
-}) => {
+const CameraTest = ({ onPhotoTaken = () => {} }: iCameraTestProps) => {
   const {hasPermission, requestPermission} = useCameraPermission();
   const [cameraDevice, setCameraDevice] = useState<'back' | 'front'>('back');
   const device = useCameraDevice(cameraDevice);
@@ -108,17 +109,17 @@ const CameraTest = ({
   }, [handleCameraPermissions]);
 
   const handleOnPress = async () => {
-    try {
-      const photo = await camera?.current?.takePhoto({flash: flashMode});
-      const uri = `file://${photo?.path}`;
-      setImageUri(uri);
-      setIsOpen(false);
-      onPhotoTaken(uri);
-    } catch (error) {
-      console.error('Error capturing photo:', error);
-      Alert.alert('Error', 'Failed to capture the photo.');
-    }
-  };
+  try {
+    const photo = await camera?.current?.takePhoto({ flash: flashMode });
+    const uri = `file://${photo?.path}`;
+    setImageUri(uri);
+    setIsOpen(false);
+    onPhotoTaken(uri);
+  } catch (error) {
+    console.error('Error capturing photo:', error);
+    Alert.alert('Error', 'Failed to capture the photo.');
+  }
+};
 
   const openSettings = async () => {
     await Linking.openSettings();

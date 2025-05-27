@@ -2,22 +2,23 @@ import React, {useEffect, useState, useCallback, useRef} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
-import {globalColors, globalStyles} from '../../styles/globalStyles';
+import {globalStyles} from '../../styles/globalStyles';
 import {useTheme} from '../../stores/ThemeContext';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SearchBar} from '../../components/molecules/Searchbar';
 import {fetchProducts} from '../../services/products';
 import {DetailsScreenParams, iProduct} from '../../services/products.type';
+import {SkeletonLoader} from '../../components/molecules/SkeletonLoader';
 
 const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -103,23 +104,23 @@ const HomeScreen = () => {
     setRefreshing(false);
   }, [loadProducts, searchQuery]);
 
- const navigateToDetails = (item: iProduct) => {
-  const params: DetailsScreenParams = {
-    _id: item._id,
-    title: item.title,
-    description: item.description,
-    price: item.price,
-    images: item.images,
-    latitude: item.location.latitude,
-    longitude: item.location.longitude,
-    user: item.user,
-    locationName: item.location.name,
+  const navigateToDetails = (item: iProduct) => {
+    const params: DetailsScreenParams = {
+      _id: item._id,
+      title: item.title,
+      description: item.description,
+      price: item.price,
+      images: item.images,
+      latitude: item.location.latitude,
+      longitude: item.location.longitude,
+      user: item.user,
+      locationName: item.location.name,
+    };
+    navigation.navigate('ProductScreen', {
+      screen: 'Details',
+      params,
+    });
   };
-  navigation.navigate('ProductScreen', {
-    screen: 'Details',
-    params,
-  });
-};
 
   const getSortedProducts = () => {
     if (sortOption === 'asc') {
@@ -170,8 +171,14 @@ const HomeScreen = () => {
         </ScrollView>
       </View>
       {isLoading ? (
-        <View style={globalDynamicStyles.centeredView}>
-          <ActivityIndicator size="large" color={globalColors.light_blue} />
+        <View style={styles.listContainer}>
+          <FlatList
+            data={Array(6).fill(null)}
+            keyExtractor={(item, index) => `skeleton-${index}`}
+            numColumns={2}
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            renderItem={() => <SkeletonLoader />}
+          />
         </View>
       ) : error ? (
         <View style={globalDynamicStyles.centeredView}>

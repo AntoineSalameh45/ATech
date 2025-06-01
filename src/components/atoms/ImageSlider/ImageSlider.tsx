@@ -1,15 +1,24 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
-  Image,
   FlatList,
   TouchableWithoutFeedback,
+  Animated,
+  GestureResponderEvent,
 } from 'react-native';
 import {ImageSliderProps} from './ImageSlider.type';
 import styles from './styles';
 
-const ImageSlider = ({images, onImageLongPress}: ImageSliderProps) => {
+const SWIPE_THRESHOLD = 10; // Minimum movement threshold to consider as swipe
+
+const ImageSlider = ({
+  images,
+  onImagePress,
+  onImageLongPress,
+}: ImageSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const scaleAnimation = useRef(new Animated.Value(1)).current;
+  const touchStart = useRef({x: 0, y: 0}).current;
 
   const onViewableItemsChanged = ({viewableItems}: any) => {
     if (viewableItems.length > 0) {
@@ -19,6 +28,36 @@ const ImageSlider = ({images, onImageLongPress}: ImageSliderProps) => {
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
+  };
+
+  const handleTouchStart = (evt: GestureResponderEvent) => {
+    const {pageX, pageY} = evt.nativeEvent;
+    touchStart.x = pageX;
+    touchStart.y = pageY;
+
+    Animated.timing(scaleAnimation, {
+      toValue: 0.9,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleTouchEnd = (evt: GestureResponderEvent, url: string) => {
+    const {pageX, pageY} = evt.nativeEvent;
+    const dx = Math.abs(pageX - touchStart.x);
+    const dy = Math.abs(pageY - touchStart.y);
+
+    const isSwipe = dx > SWIPE_THRESHOLD || dy > SWIPE_THRESHOLD;
+
+    Animated.timing(scaleAnimation, {
+      toValue: 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start(() => {
+      if (!isSwipe && onImagePress) {
+        onImagePress(url);
+      }
+    });
   };
 
   return (
@@ -33,10 +72,12 @@ const ImageSlider = ({images, onImageLongPress}: ImageSliderProps) => {
         viewabilityConfig={viewabilityConfig}
         renderItem={({item}) => (
           <TouchableWithoutFeedback
+            onPressIn={handleTouchStart}
+            onPressOut={(e) => handleTouchEnd(e, item.url)}
             onLongPress={() => onImageLongPress?.(item.url)}>
-            <Image
+            <Animated.Image
               source={{uri: item.url}}
-              style={styles.image}
+              style={[styles.image, {transform: [{scale: scaleAnimation}]}]}
               resizeMode="contain"
             />
           </TouchableWithoutFeedback>

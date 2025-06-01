@@ -175,5 +175,28 @@ export const getDynamicStyles = (theme: string) => {
       fontSize: 16,
       fontWeight: 'bold',
     },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 25,
+    right: 10,
+    padding: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '80%',
+  },
   });
 };

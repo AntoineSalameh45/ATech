@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,9 @@ import {
   PermissionsAndroid,
   Platform,
   Share,
+  Animated,
+  Image,
+  Modal,
 } from 'react-native';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
@@ -23,6 +26,7 @@ import {MailIconBlue, MailIconRed} from '../../assets/svg';
 import RNFetchBlob from 'rn-fetch-blob';
 import api from '../../services/api';
 import notifee from '@notifee/react-native';
+import {CloseCircleIcon} from '../../assets/svg';
 
 const fetchCurrentUser = async () => {
   try {
@@ -58,6 +62,8 @@ const Details = ({route}: Props) => {
   const {addItem} = useCartStore();
   const navigation = useNavigation();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -126,45 +132,75 @@ const Details = ({route}: Props) => {
       );
     }
   };
+  const scaleAnimation = useRef(new Animated.Value(1)).current;
+
+  const handleImagePress = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setModalVisible(true);
+  };
 
   const handleLongPressImage = async (imageUrl: string) => {
     try {
-      if (Platform.OS === 'android') {
-        const writePermission =
-          Platform.Version >= 33
-            ? await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-              )
-            : await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-              );
+      Alert.alert(
+        'Save Image',
+        'Do you want to save this image to your gallery?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Image save canceled'),
+            style: 'cancel',
+          },
+          {
+            text: 'Save',
+            onPress: async () => {
+              try {
+                if (Platform.OS === 'android') {
+                  const writePermission =
+                    Platform.Version >= 33
+                      ? await PermissionsAndroid.request(
+                          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+                        )
+                      : await PermissionsAndroid.request(
+                          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                        );
 
-        if (writePermission !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            'Permission Denied',
-            'Storage permission is required to save images.',
-          );
-          return;
-        }
-      }
+                  if (writePermission !== PermissionsAndroid.RESULTS.GRANTED) {
+                    Alert.alert(
+                      'Permission Denied',
+                      'Storage permission is required to save images.',
+                    );
+                    return;
+                  }
+                }
 
-      const res = await RNFetchBlob.config({
-        fileCache: true,
-        appendExt: 'jpg',
-      }).fetch('GET', imageUrl);
+                const res = await RNFetchBlob.config({
+                  fileCache: true,
+                  appendExt: 'jpg',
+                }).fetch('GET', imageUrl);
 
-      const imagePath =
-        Platform.OS === 'android' ? 'file://' + res.path() : res.path();
+                const imagePath =
+                  Platform.OS === 'android'
+                    ? 'file://' + res.path()
+                    : res.path();
 
-      await CameraRoll.saveAsset(imagePath, {
-        type: 'photo',
-        album: 'ATech',
-      });
+                await CameraRoll.saveAsset(imagePath, {
+                  type: 'photo',
+                  album: 'ATech',
+                });
 
-      Alert.alert('Success', 'Image saved to gallery!');
+                Alert.alert('Success', 'Image saved to gallery!');
+              } catch (error) {
+                Alert.alert('Error', 'Failed to save image.');
+                console.error('Save image error:', error);
+              }
+            },
+          },
+        ],
+        {cancelable: true},
+      );
     } catch (error) {
-      Alert.alert('Error', 'Failed to save image.');
-      console.error('Save image error:', error);
+      Alert.alert('Error', 'An unexpected error occurred.');
+      console.error('Handle image error:', error);
     }
   };
 
@@ -263,13 +299,13 @@ const Details = ({route}: Props) => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <ImageSlider
-        images={formattedImages}
-        onImageLongPress={image => {
-          const imageUrl = `${image}`;
-          handleLongPressImage(imageUrl);
-        }}
-      />
+      <Animated.View style={{transform: [{scale: scaleAnimation}]}}>
+        <ImageSlider
+          images={formattedImages}
+          onImagePress={image => handleImagePress(image)}
+          onImageLongPress={image => handleLongPressImage(image)}
+        />
+      </Animated.View>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.priceContainer}>
         <Text style={styles.priceLabel}>Price:</Text>
@@ -336,6 +372,25 @@ const Details = ({route}: Props) => {
             title={locationName}
           />
         </MapView>
+
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}>
+              <CloseCircleIcon height={35} width={35} />
+            </TouchableOpacity>
+            <Image
+              source={{uri: selectedImage || ''}}
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+            />
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );

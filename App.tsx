@@ -6,18 +6,33 @@ import {NavigationContainer} from '@react-navigation/native';
 import RootStack from './src/navigation/RootStack';
 import BootSplash from 'react-native-bootsplash';
 
+const linking = {
+  prefixes: ['atech://'],
+  config: {
+    initialRouteName: 'Home' as const,
+    screens: {
+      Home: 'home',
+      ProductScreen: {
+        path: 'products',
+        screens: {
+          Details: 'details/:id',
+        },
+      },
+    },
+  },
+};
+
+
 const App = () => {
   useEffect(() => {
-    BootSplash.hide({fade: true}).then(() => {
-      console.log('BootSplash has been hidden successfully');
-    });
+    BootSplash.hide({fade: true}).then(() => {});
   }, []);
 
   return (
     <GestureHandlerRootView>
       <ThemeProvider>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer linking={linking}>
             <RootStack />
           </NavigationContainer>
         </SafeAreaProvider>

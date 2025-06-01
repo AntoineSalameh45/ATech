@@ -59,5 +59,9 @@ export const globalStyles = (theme: 'light' | 'dark') => {
       fontSize: scale(16),
       fontWeight: 'bold',
     },
+    appContainer: {
+      flex: 1,
+      backgroundColor: theme === 'light' ? '#ffffff' : '#333333',
+    },
   });
 };

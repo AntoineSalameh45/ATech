@@ -33,6 +33,7 @@ export const getDynamicStyles = (theme: string) => {
       marginBottom: scale(12),
       flexDirection: 'row',
       alignItems: 'center',
+      height: scale(80),
       borderWidth: PixelRatio.getPixelSizeForLayoutSize(1),
       borderColor: saberGlow,
       shadowColor: saberGlow,
@@ -58,6 +59,24 @@ export const getDynamicStyles = (theme: string) => {
     productPrice: {
       fontSize: scale(16),
       color: isDark ? '#FF6347' : '#007BFF',
+    },
+    deleteButton: {
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'red',
+      width: scale(70),
+    },
+    deleteButtonText: {
+      color: '#ffffff',
+      fontSize: scale(16),
+      fontWeight: 'bold',
+    },
+    swipeableContainer: {
+      marginVertical: scale(8),
+      borderRadius: scale(8),
+      overflow: 'hidden',
+      height: scale(80),
     },
     quantityControl: {
       flexDirection: 'row',

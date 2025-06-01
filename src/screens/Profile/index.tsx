@@ -22,7 +22,7 @@ import api from '../../services/api';
 import {globalStyles} from '../../styles/globalStyles';
 import ProductList from '../../components/organisims/ProductList/ProductList';
 import {SectionHeader} from '../../components/atoms/SectionHeader';
-import { BASE_URL } from '@env';
+import {BASE_URL} from '@env';
 
 type AuthStackParamList = {
   Camera: {onPhotoTaken: (photoUri: string) => void};
@@ -37,6 +37,16 @@ type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainNavigatorParamList, 'Profile'>,
   StackNavigationProp<AuthStackParamList>
 >;
+
+const fetchCurrentUser = async () => {
+  try {
+    const response = await api.get('/api/user/profile');
+    return response.data.data.user;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    return null;
+  }
+};
 
 const ProfileScreen = () => {
   const {theme} = useTheme();
@@ -62,6 +72,21 @@ const ProfileScreen = () => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        if (user) {
+          setCurrentUserEmail(user.email);
+        }
+      } catch (error) {
+        console.error('Error setting user email:', error);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   const fetchProfile = async () => {
     setIsLoading(true);
@@ -77,12 +102,16 @@ const ProfileScreen = () => {
     }
   };
 
-  const fetchUserProducts = async (userId: string) => {
+  const fetchUserProducts = async (email: string) => {
     setLoadingProducts(true);
     try {
       const response = await api.get('/api/products');
-      const allProducts = response.data.data.products;
-      const userProducts = allProducts.filter((p: any) => p.userId === userId);
+      const allProducts = response.data.data;
+
+      const userProducts = allProducts.filter(
+        (product: any) => product.user?.email === email,
+      );
+
       setProducts(userProducts);
     } catch (err: any) {
       console.warn('Failed to fetch products:', err);
@@ -93,8 +122,8 @@ const ProfileScreen = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    if (profile?.id) {
-      await fetchUserProducts(profile.id);
+    if (currentUserEmail) {
+      await fetchUserProducts(currentUserEmail);
     }
     setRefreshing(false);
   };
@@ -104,10 +133,10 @@ const ProfileScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (profile?.id) {
-      fetchUserProducts(profile.id);
+    if (currentUserEmail) {
+      fetchUserProducts(currentUserEmail);
     }
-  }, [profile?.id]);
+  }, [currentUserEmail]);
 
   const handleSave = async () => {
     if (!profile || !profile.firstName.trim() || !profile.lastName.trim()) {
@@ -154,7 +183,7 @@ const ProfileScreen = () => {
       Alert.alert('Success', 'Profile updated successfully');
 
       if (response.data.data.user.id) {
-        fetchUserProducts(response.data.data.user.id);
+        fetchUserProducts(response.data.data.user.email);
       }
     } catch (err: any) {
       const errorMessage =

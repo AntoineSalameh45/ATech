@@ -11,6 +11,7 @@ import {
   Modal,
   PermissionsAndroid,
   Platform,
+  Dimensions,
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import {z} from 'zod';
@@ -21,6 +22,7 @@ import {useTheme} from '../../stores/ThemeContext';
 import CameraTest from '../CameraTest';
 import api from '../../services/api';
 import {AuthStore} from '../../stores/AuthStore';
+import MapView, { Marker } from 'react-native-maps';
 
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
@@ -60,6 +62,8 @@ const UploadProductScreen = () => {
   const {accessToken} = AuthStore();
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
+  const [mapVisible, setMapVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATION);
 
   const [images, setImages] = useState<
     Array<{uri: string; type: string; name: string}>
@@ -70,6 +74,7 @@ const UploadProductScreen = () => {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: {errors},
   } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
@@ -120,6 +125,16 @@ const UploadProductScreen = () => {
     };
     setImages(prev => [...prev, image]);
     setShowCamera(false);
+  };
+
+  const onMapPress = (event: any) => {
+    const {latitude, longitude} = event.nativeEvent.coordinate;
+    setSelectedLocation({name: 'Selected Location', latitude, longitude});
+  };
+
+  const saveLocation = () => {
+    setValue('location', JSON.stringify(selectedLocation));
+    setMapVisible(false);
   };
 
   const onSubmit = async (data: ProductForm) => {
@@ -235,23 +250,59 @@ const UploadProductScreen = () => {
           <Text style={{color: 'red'}}>{errors.price.message}</Text>
         )}
 
-        <Text style={styles.label}>Location (optional JSON)</Text>
+        <Text style={styles.label}>Location (optional)</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setMapVisible(true)}>
+          <Text style={styles.label}>Select Location on Map</Text>
+        </TouchableOpacity>
         <Controller
           control={control}
           name="location"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({field: {value}}) => (
             <TextInput
-              placeholder='e.g. {"name": "City", "latitude": 33.5, "longitude": 35.5}'
-              placeholderTextColor="#888888"
-              multiline
-              numberOfLines={3}
-              onBlur={onBlur}
-              onChangeText={onChange}
               value={value}
+              editable={false}
+              multiline
               style={[styles.input, errors.location && {borderColor: 'red'}]}
             />
           )}
         />
+        <Modal
+          visible={mapVisible}
+          animationType="slide"
+          onRequestClose={() => setMapVisible(false)}>
+          <MapView
+            style={{
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+            }}
+            initialRegion={{
+              latitude: selectedLocation.latitude,
+              longitude: selectedLocation.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+            onPress={onMapPress}>
+            <Marker
+              coordinate={{
+                latitude: selectedLocation.latitude,
+                longitude: selectedLocation.longitude,
+              }}
+              title={selectedLocation.name}
+            />
+          </MapView>
+          <View style={styles.mapButtons}>
+            <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
+              <Text style={{color: 'white'}}>Save Location</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setMapVisible(false)}>
+              <Text style={{color: 'white'}}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
         <Text style={[styles.label, {marginBottom: 8}]}>
           Selected Images ({images.length} / 5)
@@ -273,7 +324,9 @@ const UploadProductScreen = () => {
                         text: 'Remove',
                         onPress: () =>
                           setImages(prevImages =>
-                            prevImages.filter((_, imageIdx) => imageIdx !== idx),
+                            prevImages.filter(
+                              (_, imageIdx) => imageIdx !== idx,
+                            ),
                           ),
                       },
                     ],

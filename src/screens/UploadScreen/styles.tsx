@@ -23,6 +23,7 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       flexGrow: 1,
       padding: scale(16),
       backgroundColor: background,
+      paddingBottom: scale(75),
     },
     label: {
       fontSize: scale(14),
@@ -109,6 +110,31 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       color: 'white',
       fontSize: 12,
       fontWeight: 'bold',
+    },
+    mapButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      position: 'absolute',
+      bottom: scale(20),
+      left: scale(16),
+      right: scale(16),
+    },
+    saveButton: {
+      flex: 1,
+      backgroundColor: primaryColor,
+      paddingVertical: scale(12),
+      borderRadius: scale(6),
+      alignItems: 'center',
+      marginRight: scale(8),
+    },
+    cancelButton: {
+      flex: 1,
+      backgroundColor: dangerColor,
+      paddingVertical: scale(12),
+      borderRadius: scale(6),
+      alignItems: 'center',
+      marginLeft: scale(8),
     },
   });
 };

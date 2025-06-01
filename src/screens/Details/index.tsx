@@ -8,6 +8,7 @@ import {
   Linking,
   PermissionsAndroid,
   Platform,
+  Share,
 } from 'react-native';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
@@ -21,6 +22,7 @@ import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import {MailIconBlue, MailIconRed} from '../../assets/svg';
 import RNFetchBlob from 'rn-fetch-blob';
 import api from '../../services/api';
+import notifee from '@notifee/react-native';
 
 const fetchCurrentUser = async () => {
   try {
@@ -86,6 +88,45 @@ const Details = ({route}: Props) => {
     Alert.alert('Success', 'Item added to cart!');
   };
 
+  const handleShare = async () => {
+    const productUrl = `atech://products/details/${_id}`;
+    const message = `Check out this product: ${title}\n${productUrl}`;
+
+    try {
+      await notifee.requestPermission();
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        vibration: true,
+        sound: 'lightsaber',
+      });
+
+      await notifee.displayNotification({
+        title: 'Product shared',
+        body: 'You shared a product link',
+        android: {
+          channelId,
+          pressAction: {id: 'default'},
+          smallIcon: 'ic_small_icon',
+          color: '#87CEEB',
+          largeIcon: require('../../assets/profile-placeholder.png'),
+          sound: 'lightsaber',
+        },
+      });
+
+      await Share.share({
+        message,
+        url: productUrl,
+      });
+    } catch (error) {
+      console.error('Error sharing product:', error);
+      Alert.alert(
+        'Error',
+        'An unexpected error occurred while sharing the product.',
+      );
+    }
+  };
+
   const handleLongPressImage = async (imageUrl: string) => {
     try {
       if (Platform.OS === 'android') {
@@ -115,7 +156,7 @@ const Details = ({route}: Props) => {
       const imagePath =
         Platform.OS === 'android' ? 'file://' + res.path() : res.path();
 
-      await CameraRoll.save(imagePath, {
+      await CameraRoll.saveAsset(imagePath, {
         type: 'photo',
         album: 'ATech',
       });
@@ -257,7 +298,7 @@ const Details = ({route}: Props) => {
         <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareButton}>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Text style={styles.shareButtonText}>Share</Text>
         </TouchableOpacity>
       </View>

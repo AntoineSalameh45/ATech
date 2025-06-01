@@ -10,7 +10,7 @@ import EditProduct from '../../../screens/EditProduct';
 
 const ProductStack = createNativeStackNavigator<RootStackParamList>();
 
-function ProfileNav() {
+function ProductNav() {
   const {theme, toggleTheme} = useTheme();
   return (
     <ProductStack.Navigator
@@ -41,4 +41,4 @@ function ProfileNav() {
   );
 }
 
-export default ProfileNav;
+export default ProductNav;

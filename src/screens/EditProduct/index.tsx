@@ -5,13 +5,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/stacks/RootStackParamList';
 import { useTheme } from '../../stores/ThemeContext';
 import { BASE_URL } from '@env';
-import {AuthStore} from '../../stores/AuthStore';
+import { AuthStore } from '../../stores/AuthStore';
 import getDynamicStyles from './styles';
+import MapPicker from '../../components/molecules/MapPicker';
 
 type EditProductScreenRouteProp = RouteProp<RootStackParamList, 'EditProduct'>;
 
@@ -38,12 +40,16 @@ const EditProduct = ({ route }: Props) => {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [price, setPrice] = useState(initialPrice.toString());
-  const [latitude, setLatitude] = useState(initialLatitude.toString());
-  const [longitude, setLongitude] = useState(initialLongitude.toString());
   const [locationName, setLocationName] = useState(initialLocationName);
+  const [location, setLocation] = useState({
+    name: initialLocationName,
+    latitude: initialLatitude,
+    longitude: initialLongitude,
+  });
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!title || !description || !price || !latitude || !longitude) {
+    if (!title || !description || !price) {
       Alert.alert('Error', 'Please fill out all fields.');
       return;
     }
@@ -52,11 +58,12 @@ const EditProduct = ({ route }: Props) => {
       title,
       description,
       price: parseFloat(price),
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      locationName,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      locationName: location.name,
     };
 
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/products/${productId}`, {
         method: 'PUT',
@@ -76,6 +83,8 @@ const EditProduct = ({ route }: Props) => {
     } catch (error) {
       console.error('Update error:', error);
       Alert.alert('Error', 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,22 +116,14 @@ const EditProduct = ({ route }: Props) => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Latitude</Text>
-      <TextInput
-        style={styles.input}
-        value={latitude}
-        onChangeText={setLatitude}
-        placeholder="Enter latitude"
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Longitude</Text>
-      <TextInput
-        style={styles.input}
-        value={longitude}
-        onChangeText={setLongitude}
-        placeholder="Enter longitude"
-        keyboardType="numeric"
+      <Text style={styles.label}>Location</Text>
+      <MapPicker
+        initialLocation={location}
+        onSave={(loc) => {
+          setLocation(loc);
+          setLocationName(loc.name);
+        }}
+        styles={styles}
       />
 
       <Text style={styles.label}>Location Name</Text>
@@ -133,8 +134,16 @@ const EditProduct = ({ route }: Props) => {
         placeholder="Enter location name"
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={handleSave}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.saveButtonText}>Save</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

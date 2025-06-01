@@ -22,6 +22,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
   container: {
     flex: 1,
     backgroundColor: isDark ? globalColors.dark_background : globalColors.light_background,
+    padding: 30,
   },
   label: {
     fontSize: 16,
@@ -49,7 +50,7 @@ const getDynamicStyles = (theme: 'light' | 'dark') => {
   saveButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: isDark ? globalColors.light_text : globalColors.dark_text,
+    color: globalColors.dark_text,
   },
 });
 };

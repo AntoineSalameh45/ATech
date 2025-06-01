@@ -22,7 +22,8 @@ import {useTheme} from '../../stores/ThemeContext';
 import CameraTest from '../CameraTest';
 import api from '../../services/api';
 import {AuthStore} from '../../stores/AuthStore';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
+import notifee from '@notifee/react-native';
 
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
@@ -64,7 +65,6 @@ const UploadProductScreen = () => {
   const styles = getDynamicStyles(theme);
   const [mapVisible, setMapVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATION);
-
   const [images, setImages] = useState<
     Array<{uri: string; type: string; name: string}>
   >([]);
@@ -173,6 +173,26 @@ const UploadProductScreen = () => {
       if (response.data) {
         Alert.alert('Success', 'Product uploaded successfully!');
         setImages([]);
+        await notifee.requestPermission();
+        const channelId = await notifee.createChannel({
+          id: 'default',
+          name: 'Default Channel',
+          vibration: true,
+          sound: 'lightsaber',
+        });
+
+        await notifee.displayNotification({
+          title: 'Product posted',
+          body: 'Your product has been uploaded successfully',
+          android: {
+            channelId,
+            pressAction: {id: 'default'},
+            smallIcon: 'ic_small_icon',
+            color: '#87CEEB',
+            largeIcon: require('../../assets/profile-placeholder.png'),
+            sound: 'lightsaber',
+          },
+        });
       } else {
         throw new Error('Unexpected response format');
       }

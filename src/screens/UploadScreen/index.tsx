@@ -111,8 +111,8 @@ const UploadProductScreen = () => {
         } else if (response.assets) {
           const newImages = response.assets.map(asset => ({
             uri: asset.uri!,
-            type: asset.type || 'image/jpeg' || 'image/png',
-            name: asset.fileName || 'image.jpg' || 'image.png',
+            type: asset.type || 'image/jpeg',
+            name: asset.fileName || `image_${Date.now()}.jpg`,
           }));
           setImages(prev => [...prev, ...newImages]);
         }
@@ -167,7 +167,7 @@ const UploadProductScreen = () => {
         },
       });
 
-      if (response.data) {
+      if (response.status === 201 && response.data) {
         Alert.alert('Success', 'Product uploaded successfully!');
         setImages([]);
         await notifee.requestPermission();
@@ -195,10 +195,13 @@ const UploadProductScreen = () => {
       }
     } catch (error: any) {
       console.error(error);
-      Alert.alert(
-        'Upload failed',
-        error.response?.data?.message || error.message,
-      );
+
+      const message =
+        error.response?.status === 500
+          ? 'Server error. Please try again later.'
+          : error.response?.data?.message || error.message;
+
+      Alert.alert('Upload failed', message);
     } finally {
       setLoading(false);
     }
@@ -223,7 +226,7 @@ const UploadProductScreen = () => {
           disabled={loading}
           style={styles.uploadButton}>
           {loading ? (
-            <ActivityIndicator />
+            <ActivityIndicator color="white" />
           ) : (
             <Text style={styles.buttonText}>Upload Product</Text>
           )}

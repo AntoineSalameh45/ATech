@@ -53,12 +53,12 @@ const MapPicker = ({ initialLocation = DEFAULT_LOCATION, onSave, styles }: MapPi
         </MapView>
         <View style={styles.mapButtons}>
           <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
-            <Text style={{ color: 'white' }}>Save Location</Text>
+            <Text style={styles.saveButtonText}>Save Location</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={() => setMapVisible(false)}>
-            <Text style={{ color: 'white' }}>Cancel</Text>
+            <Text style={styles.saveButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </Modal>

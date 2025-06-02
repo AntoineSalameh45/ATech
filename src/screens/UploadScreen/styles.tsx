@@ -48,18 +48,6 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       marginBottom: scale(8),
       fontSize: scale(12),
     },
-    imagesContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      marginBottom: scale(16),
-    },
-    imageThumb: {
-      width: scale(80),
-      height: scale(80),
-      marginRight: scale(8),
-      marginBottom: scale(8),
-      borderRadius: scale(6),
-    },
     buttonRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -93,24 +81,6 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       borderRadius: scale(6),
       alignItems: 'center',
     },
-    imageWrapper: {
-      position: 'relative',
-      marginBottom: 8,
-    },
-    removeButton: {
-      position: 'absolute',
-      top: -5,
-      right: -5,
-      backgroundColor: 'red',
-      padding: 4,
-      borderRadius: 15,
-      zIndex: 1,
-    },
-    removeButtonText: {
-      color: 'white',
-      fontSize: 12,
-      fontWeight: 'bold',
-    },
     mapButtons: {
       flexDirection: 'row',
       justifyContent: 'space-around',
@@ -127,6 +97,9 @@ export const getDynamicStyles = (theme: 'light' | 'dark') => {
       borderRadius: scale(6),
       alignItems: 'center',
       marginRight: scale(8),
+    },
+    saveButtoText: {
+      color: '#fff',
     },
     cancelButton: {
       flex: 1,

@@ -1,19 +1,15 @@
 import React, {useState} from 'react';
 import {
-  View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
-  Image,
   Modal,
   PermissionsAndroid,
   Platform,
-  Dimensions,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -22,8 +18,10 @@ import {useTheme} from '../../stores/ThemeContext';
 import CameraTest from '../CameraTest';
 import api from '../../services/api';
 import {AuthStore} from '../../stores/AuthStore';
-import MapView, {Marker} from 'react-native-maps';
 import notifee from '@notifee/react-native';
+import {ProductForm} from '../../components/molecules/ProductForm';
+import {ImagePicker} from '../../components/molecules/ImagePicker';
+import {MapModal} from '../../components/molecules/MapModal';
 
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
@@ -71,12 +69,7 @@ const UploadProductScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: {errors},
-  } = useForm<ProductForm>({
+  const form = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       title: '',
@@ -85,6 +78,20 @@ const UploadProductScreen = () => {
       location: '',
     },
   });
+
+  const {handleSubmit, setValue} = form;
+
+  const addImage = (image: {uri: string; type: string; name: string}) => {
+    if (images.length >= 5) {
+      Alert.alert('Image limit', 'You can only upload up to 5 images.');
+      return;
+    }
+    setImages(prev => [...prev, image]);
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const pickImagesFromGallery = async () => {
     const hasPermission = await requestGalleryPermission();
@@ -104,8 +111,8 @@ const UploadProductScreen = () => {
         } else if (response.assets) {
           const newImages = response.assets.map(asset => ({
             uri: asset.uri!,
-            type: asset.type || 'image/jpeg',
-            name: asset.fileName || 'image.jpg',
+            type: asset.type || 'image/jpeg' || 'image/png',
+            name: asset.fileName || 'image.jpg' || 'image.png',
           }));
           setImages(prev => [...prev, ...newImages]);
         }
@@ -114,22 +121,12 @@ const UploadProductScreen = () => {
   };
 
   const onCaptureFromCamera = (uri: string) => {
-    if (images.length >= 5) {
-      Alert.alert('Image limit', 'You can only upload up to 5 images.');
-      return;
-    }
-    const image = {
+    addImage({
       uri,
       type: 'image/jpeg',
       name: uri.split('/').pop() || `photo_${Date.now()}.jpg`,
-    };
-    setImages(prev => [...prev, image]);
+    });
     setShowCamera(false);
-  };
-
-  const onMapPress = (event: any) => {
-    const {latitude, longitude} = event.nativeEvent.coordinate;
-    setSelectedLocation({name: 'Selected Location', latitude, longitude});
   };
 
   const saveLocation = () => {
@@ -210,192 +207,36 @@ const UploadProductScreen = () => {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.label}>Title</Text>
-        <Controller
-          control={control}
-          name="title"
-          render={({field: {onChange, onBlur, value}}) => (
-            <TextInput
-              placeholder="Enter product title"
-              placeholderTextColor="#888888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              style={[styles.input, errors.title && {borderColor: 'red'}]}
-            />
-          )}
+        <ProductForm
+          form={form}
+          styles={styles}
+          onSelectLocation={() => setMapVisible(true)}
         />
-        {errors.title && (
-          <Text style={{color: 'red'}}>{errors.title.message}</Text>
-        )}
-
-        <Text style={styles.label}>Description</Text>
-        <Controller
-          control={control}
-          name="description"
-          render={({field: {onChange, onBlur, value}}) => (
-            <TextInput
-              placeholder="Enter product description"
-              placeholderTextColor="#888888"
-              multiline
-              numberOfLines={4}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              style={[styles.input, errors.description && {borderColor: 'red'}]}
-            />
-          )}
+        <ImagePicker
+          images={images}
+          onAddImage={pickImagesFromGallery}
+          onRemoveImage={removeImage}
+          onOpenCamera={() => setShowCamera(true)}
         />
-        {errors.description && (
-          <Text style={{color: 'red'}}>{errors.description.message}</Text>
-        )}
-
-        <Text style={styles.label}>Price</Text>
-        <Controller
-          control={control}
-          name="price"
-          render={({field: {onChange, onBlur, value}}) => (
-            <TextInput
-              placeholder="Enter price"
-              placeholderTextColor="#888888"
-              keyboardType="decimal-pad"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              style={[styles.input, errors.price && {borderColor: 'red'}]}
-            />
-          )}
-        />
-        {errors.price && (
-          <Text style={{color: 'red'}}>{errors.price.message}</Text>
-        )}
-
-        <Text style={styles.label}>Location (optional)</Text>
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => setMapVisible(true)}>
-          <Text style={styles.label}>Select Location on Map</Text>
-        </TouchableOpacity>
-        <Controller
-          control={control}
-          name="location"
-          render={({field: {value}}) => (
-            <TextInput
-              value={value}
-              editable={false}
-              multiline
-              style={[styles.input, errors.location && {borderColor: 'red'}]}
-            />
-          )}
-        />
-        <Modal
-          visible={mapVisible}
-          animationType="slide"
-          onRequestClose={() => setMapVisible(false)}>
-          <MapView
-            style={{
-              width: Dimensions.get('window').width,
-              height: Dimensions.get('window').height,
-            }}
-            initialRegion={{
-              latitude: selectedLocation.latitude,
-              longitude: selectedLocation.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-            onPress={onMapPress}>
-            <Marker
-              coordinate={{
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-              }}
-              title={selectedLocation.name}
-            />
-          </MapView>
-          <View style={styles.mapButtons}>
-            <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
-              <Text style={{color: 'white'}}>Save Location</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setMapVisible(false)}>
-              <Text style={{color: 'white'}}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-        <Text style={[styles.label, {marginBottom: 8}]}>
-          Selected Images ({images.length} / 5)
-        </Text>
-
-        <View style={styles.imagesContainer}>
-          {images.map((img, idx) => (
-            <View key={idx} style={styles.imageWrapper}>
-              <Image source={{uri: img.uri}} style={styles.imageThumb} />
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => {
-                  Alert.alert(
-                    'Remove Image',
-                    'Are you sure you want to remove this image?',
-                    [
-                      {text: 'Cancel', style: 'cancel'},
-                      {
-                        text: 'Remove',
-                        onPress: () =>
-                          setImages(prevImages =>
-                            prevImages.filter(
-                              (_, imageIdx) => imageIdx !== idx,
-                            ),
-                          ),
-                      },
-                    ],
-                  );
-                }}>
-                <Text style={styles.removeButtonText}>Remove</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.buttonPrimary,
-              images.length >= 5 && styles.buttonDisabled,
-            ]}
-            onPress={pickImagesFromGallery}
-            disabled={images.length >= 5}>
-            <Text style={{color: 'white'}}>
-              {images.length >= 5 ? 'Max 5 images selected' : 'Pick Images'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.buttonPrimary,
-              images.length >= 5 && styles.buttonDisabled,
-            ]}
-            onPress={() => setShowCamera(true)}
-            disabled={images.length >= 5}>
-            <Text style={{color: 'white'}}>Open Camera</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          style={[styles.uploadButton, loading && styles.buttonDisabled]}
           onPress={handleSubmit(onSubmit)}
-          disabled={loading}>
+          disabled={loading}
+          style={styles.uploadButton}>
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator />
           ) : (
-            <Text style={{color: 'white', fontWeight: 'bold'}}>
-              Upload Product
-            </Text>
+            <Text style={styles.buttonText}>Upload Product</Text>
           )}
         </TouchableOpacity>
+        <MapModal
+          visible={mapVisible}
+          onClose={() => setMapVisible(false)}
+          onSave={saveLocation}
+          onMapPress={event =>
+            setSelectedLocation(event.nativeEvent.coordinate)
+          }
+          selectedLocation={selectedLocation}
+        />
       </ScrollView>
 
       <Modal
@@ -403,7 +244,7 @@ const UploadProductScreen = () => {
         animationType="slide"
         onRequestClose={() => setShowCamera(false)}>
         <CameraTest
-          onPhotoTaken={uri => onCaptureFromCamera(uri)}
+          onPhotoTaken={onCaptureFromCamera}
           onCancel={() => setShowCamera(false)}
         />
       </Modal>

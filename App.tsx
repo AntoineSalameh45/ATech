@@ -9,19 +9,22 @@ import BootSplash from 'react-native-bootsplash';
 const linking = {
   prefixes: ['atech://'],
   config: {
-    initialRouteName: 'Home' as const,
     screens: {
-      Home: 'home',
-      ProductScreen: {
-        path: 'products',
+      HomePage: {
+        path: 'home',
         screens: {
-          Details: 'details/:id',
+          ProductScreen: {
+            path: 'products',
+            screens: {
+              Details: 'details/:id',
+            },
+          },
         },
       },
+      Cart: 'cart',
     },
   },
 };
-
 
 const App = () => {
   useEffect(() => {

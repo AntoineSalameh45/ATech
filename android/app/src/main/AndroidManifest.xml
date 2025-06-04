@@ -38,8 +38,13 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="atech" android:host="products" />
+        <data android:scheme="atech" />
       </intent-filter>
     </activity>
+    <service
+        android:name=".MyFirebaseMessagingService"  android:exported="false"> <intent-filter>
+      <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+    </service>
   </application>
 </manifest>

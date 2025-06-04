@@ -1,6 +1,15 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+project.ext.envConfigFiles = [
+    development: ".env.development",
+    staging: ".env.staging",
+    production: ".env.production",
+]
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -84,6 +93,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", newArchEnabled.toBoolean().toString()
+        buildConfigField "boolean", "IS_HERMES_ENABLED", hermesEnabled.toBoolean().toString()
     }
     signingConfigs {
         debug {
@@ -105,15 +117,43 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    flavorDimensions "appType"
+    productFlavors {
+        development_atech {
+            dimension "appType"
+            resValue "string", "app_name", "Atech Development"
+        }
+        staging_atech {
+            dimension "appType"
+            resValue "string", "app_name", "Atech Staging"
+        }
+        production_atech {
+            dimension "appType"
+            resValue "string", "app_name", "Atech"
+        }
+    }
 }
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation 'com.google.firebase:firebase-crashlytics:19.4.3'
+    implementation 'com.google.firebase:firebase-messaging:24.1.1'
+    implementation project(':react-native-config')
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+}
+
+gradle.projectsEvaluated {
+    rootProject.tasks.matching { it.name.startsWith("install") }.each { task ->
+        task.onlyIf {
+            def env = System.getenv("APP_FLAVOR") ?: "development_atech"
+            task.name.contains(env)
+        }
     }
 }

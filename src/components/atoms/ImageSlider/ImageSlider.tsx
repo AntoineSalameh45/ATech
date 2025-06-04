@@ -2,14 +2,14 @@ import React, {useState, useRef} from 'react';
 import {
   View,
   FlatList,
-  TouchableWithoutFeedback,
+  Pressable,
   Animated,
   GestureResponderEvent,
 } from 'react-native';
 import {ImageSliderProps} from './ImageSlider.type';
 import styles from './styles';
 
-const SWIPE_THRESHOLD = 10; // Minimum movement threshold to consider as swipe
+const SWIPE_THRESHOLD = 10;
 
 const ImageSlider = ({
   images,
@@ -17,48 +17,57 @@ const ImageSlider = ({
   onImageLongPress,
 }: ImageSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const scaleAnimation = useRef(new Animated.Value(1)).current;
-  const touchStart = useRef({x: 0, y: 0}).current;
+  const scaleAnimations = useRef(
+    images.map(() => new Animated.Value(1)),
+  ).current;
 
-  const onViewableItemsChanged = ({viewableItems}: any) => {
+  const touchStart = useRef<{x: number; y: number}>({x: 0, y: 0});
+  const longPressActivated = useRef(false); // <-- Add this
+
+  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
     if (viewableItems.length > 0) {
-      setActiveIndex(viewableItems[0].index || 0);
+      setActiveIndex(viewableItems[0].index ?? 0);
     }
-  };
+  }).current;
 
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
+  const viewabilityConfig = {itemVisiblePercentThreshold: 50};
 
-  const handleTouchStart = (evt: GestureResponderEvent) => {
-    const {pageX, pageY} = evt.nativeEvent;
-    touchStart.x = pageX;
-    touchStart.y = pageY;
+  const handleTouchStart = (index: number) => (_evt: GestureResponderEvent) => {
+    touchStart.current = {x: 0, y: 0};
+    longPressActivated.current = false;
 
-    Animated.timing(scaleAnimation, {
+    Animated.timing(scaleAnimations[index], {
       toValue: 0.9,
       duration: 100,
       useNativeDriver: true,
     }).start();
   };
 
-  const handleTouchEnd = (evt: GestureResponderEvent, url: string) => {
-    const {pageX, pageY} = evt.nativeEvent;
-    const dx = Math.abs(pageX - touchStart.x);
-    const dy = Math.abs(pageY - touchStart.y);
+  const handleTouchEnd =
+    (index: number, url: string) => (evt: GestureResponderEvent) => {
+      const {pageX, pageY} = evt.nativeEvent;
+      const dx = Math.abs(pageX - touchStart.current.x);
+      const dy = Math.abs(pageY - touchStart.current.y);
 
-    const isSwipe = dx > SWIPE_THRESHOLD || dy > SWIPE_THRESHOLD;
+      const isSwipe = dx > SWIPE_THRESHOLD || dy > SWIPE_THRESHOLD;
 
-    Animated.timing(scaleAnimation, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => {
-      if (!isSwipe && onImagePress) {
-        onImagePress(url);
-      }
-    });
-  };
+      Animated.timing(scaleAnimations[index], {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }).start(() => {
+        if (!isSwipe && onImagePress && !longPressActivated.current) {
+          onImagePress(url);
+        }
+        longPressActivated.current = false;
+      });
+    };
+
+  const handleTouchStartPosition =
+    (index: number) => (evt: GestureResponderEvent) => {
+      const {pageX, pageY} = evt.nativeEvent;
+      touchStart.current = {x: pageX, y: pageY};
+    };
 
   return (
     <View style={styles.container}>
@@ -70,17 +79,24 @@ const ImageSlider = ({
         pagingEnabled
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-        renderItem={({item}) => (
-          <TouchableWithoutFeedback
-            onPressIn={handleTouchStart}
-            onPressOut={(e) => handleTouchEnd(e, item.url)}
-            onLongPress={() => onImageLongPress?.(item.url)}>
+        renderItem={({item, index}) => (
+          <Pressable
+            onPressIn={handleTouchStart(index)}
+            onTouchStart={handleTouchStartPosition(index)}
+            onPressOut={handleTouchEnd(index, item.url)}
+            onLongPress={() => {
+              longPressActivated.current = true;
+              onImageLongPress?.(item.url);
+            }}>
             <Animated.Image
               source={{uri: item.url}}
-              style={[styles.image, {transform: [{scale: scaleAnimation}]}]}
+              style={[
+                styles.image,
+                {transform: [{scale: scaleAnimations[index]}]},
+              ]}
               resizeMode="contain"
             />
-          </TouchableWithoutFeedback>
+          </Pressable>
         )}
       />
       <View style={styles.pagination}>

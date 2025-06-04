@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "673443732110",
+    "project_id": "atech-d114f",
+    "storage_bucket": "atech-d114f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673443732110:android:4d41eb326e4527b55a07df",
+        "android_client_info": {
+          "package_name": "com.atech"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5s48qnj-8KhvZDQ3RKMMv6bIe6oL6a38"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

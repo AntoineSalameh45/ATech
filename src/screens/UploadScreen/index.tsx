@@ -22,6 +22,7 @@ import notifee from '@notifee/react-native';
 import {ProductForm} from '../../components/molecules/ProductForm';
 import {ImagePicker} from '../../components/molecules/ImagePicker';
 import {MapModal} from '../../components/molecules/MapModal';
+import {useNavigation} from '@react-navigation/native';
 
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
@@ -56,8 +57,8 @@ const DEFAULT_LOCATION = {
   latitude: 33.8886,
   longitude: 35.4955,
 };
-
 const UploadProductScreen = () => {
+  const navigation = useNavigation();
   const {accessToken} = AuthStore();
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
@@ -174,6 +175,7 @@ const UploadProductScreen = () => {
 
       if (response.status === 201 && response.data) {
         Alert.alert('Success', 'Product uploaded successfully!');
+
         setImages([]);
         await notifee.requestPermission();
         const channelId = await notifee.createChannel({
@@ -189,20 +191,21 @@ const UploadProductScreen = () => {
           title: 'Product posted',
           body: 'Your product has been uploaded successfully',
           android: {
-            channelId,
-            pressAction: {
-              id: 'default',
-              launchActivity: 'default',
-            },
-            smallIcon: 'ic_small_icon',
-            color: '#87CEEB',
-            largeIcon: require('../../assets/profile-placeholder.png'),
-            sound: 'lightsaber',
+        channelId,
+        pressAction: {
+          id: 'default',
+          launchActivity: 'default',
+        },
+        smallIcon: 'ic_small_icon',
+        color: '#87CEEB',
+        largeIcon: require('../../assets/profile-placeholder.png'),
+        sound: 'lightsaber',
           },
           data: {
-            productId: String(productId),
+        productId: String(productId),
           },
         });
+        navigation.navigate('HomePage');
       } else {
         throw new Error('Unexpected response format');
       }

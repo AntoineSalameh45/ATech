@@ -93,7 +93,22 @@ const Details = ({route}: Props) => {
       quantity: 1,
       image: formattedImages[0]?.url || '',
     });
-    Alert.alert('Success', 'Item added to cart!');
+    Alert.alert(
+      'Success',
+      'Item added to cart!',
+      [
+        {
+          text: 'Go to Cart',
+          onPress: () => navigation.navigate('Cart'),
+        },
+        {
+          text: 'Continue Browsing',
+          onPress: () => navigation.navigate('HomePage'),
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleShare = async () => {

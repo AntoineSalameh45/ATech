@@ -130,7 +130,12 @@ const UploadProductScreen = () => {
   };
 
   const saveLocation = () => {
-    setValue('location', JSON.stringify(selectedLocation));
+    const formattedLocation = {
+      name: selectedLocation.name || 'Custom Location',
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
+    };
+    setValue('location', JSON.stringify(formattedLocation));
     setMapVisible(false);
   };
 
@@ -178,16 +183,24 @@ const UploadProductScreen = () => {
           sound: 'lightsaber',
         });
 
+        const productId = response.data.data._id;
+
         await notifee.displayNotification({
           title: 'Product posted',
           body: 'Your product has been uploaded successfully',
           android: {
             channelId,
-            pressAction: {id: 'default'},
+            pressAction: {
+              id: 'default',
+              launchActivity: 'default',
+            },
             smallIcon: 'ic_small_icon',
             color: '#87CEEB',
             largeIcon: require('../../assets/profile-placeholder.png'),
             sound: 'lightsaber',
+          },
+          data: {
+            productId: String(productId),
           },
         });
       } else {

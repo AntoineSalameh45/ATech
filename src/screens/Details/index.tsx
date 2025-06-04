@@ -79,9 +79,11 @@ const Details = ({route}: Props) => {
     getCurrentUser();
   }, []);
 
-  const formattedImages = images?.map((img: {url: string}) => ({
-    url: `${BASE_URL}${img.url}`,
-  }));
+  const formattedImages = (images && images.length > 0)
+  ? images.map((img: { url: string }) => ({
+      url: img.url.startsWith('http') ? img.url : `${BASE_URL}${img.url}`,
+    }))
+  : [];
 
   const handleAddToCart = () => {
     addItem({

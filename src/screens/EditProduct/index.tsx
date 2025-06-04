@@ -13,7 +13,7 @@ import { useTheme } from '../../stores/ThemeContext';
 import { BASE_URL } from '@env';
 import { AuthStore } from '../../stores/AuthStore';
 import getDynamicStyles from './styles';
-import MapPicker from '../../components/molecules/MapPicker';
+import { MapModal } from '../../components/molecules/MapModal';
 
 type EditProductScreenRouteProp = RouteProp<RootStackParamList, 'EditProduct'>;
 
@@ -46,6 +46,7 @@ const EditProduct = ({ route }: Props) => {
     latitude: initialLatitude,
     longitude: initialLongitude,
   });
+  const [mapVisible, setMapVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
@@ -58,9 +59,11 @@ const EditProduct = ({ route }: Props) => {
       title,
       description,
       price: parseFloat(price),
-      latitude: location.latitude,
-      longitude: location.longitude,
-      locationName: location.name,
+      location: {
+        name: location.name || locationName,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
     };
 
     setLoading(true);
@@ -88,64 +91,83 @@ const EditProduct = ({ route }: Props) => {
     }
   };
 
+  const saveLocation = () => {
+    setLocationName(location.name);
+    setMapVisible(false);
+  };
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Title</Text>
-      <TextInput
-        style={styles.input}
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Enter product title"
-      />
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.label}>Title</Text>
+        <TextInput
+          style={styles.input}
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Enter product title"
+        />
 
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={styles.input}
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Enter product description"
-        multiline
-      />
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.input}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Enter product description"
+          multiline
+        />
 
-      <Text style={styles.label}>Price</Text>
-      <TextInput
-        style={styles.input}
-        value={price}
-        onChangeText={setPrice}
-        placeholder="Enter product price"
-        keyboardType="numeric"
-      />
+        <Text style={styles.label}>Price</Text>
+        <TextInput
+          style={styles.input}
+          value={price}
+          onChangeText={setPrice}
+          placeholder="Enter product price"
+          keyboardType="numeric"
+        />
 
-      <Text style={styles.label}>Location</Text>
-      <MapPicker
-        initialLocation={location}
-        onSave={(loc) => {
-          setLocation(loc);
-          setLocationName(loc.name);
-        }}
-        styles={styles}
-      />
+        <Text style={styles.label}>Location</Text>
+        <TouchableOpacity
+          style={styles.label}
+          onPress={() => setMapVisible(true)}>
+          <Text style={styles.title}>
+            {location.name || 'Set Location'}
+          </Text>
+        </TouchableOpacity>
 
-      <Text style={styles.label}>Location Name</Text>
-      <TextInput
-        style={styles.input}
-        value={locationName}
-        onChangeText={setLocationName}
-        placeholder="Enter location name"
-      />
+        <Text style={styles.label}>Location Name</Text>
+        <TextInput
+          style={styles.input}
+          value={locationName}
+          onChangeText={setLocationName}
+          placeholder="Enter location name"
+        />
 
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={handleSave}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.saveButtonText}>Save</Text>
-        )}
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSave}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>Save</Text>
+          )}
+        </TouchableOpacity>
+      </ScrollView>
+
+      <MapModal
+        visible={mapVisible}
+        onClose={() => setMapVisible(false)}
+        onSave={saveLocation}
+        onMapPress={(event) =>
+          setLocation({
+            ...location,
+            latitude: event.nativeEvent.coordinate.latitude,
+            longitude: event.nativeEvent.coordinate.longitude,
+          })
+        }
+        selectedLocation={location}
+      />
+    </>
   );
 };
 

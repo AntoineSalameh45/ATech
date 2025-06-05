@@ -22,7 +22,7 @@ const ImageSlider = ({
   ).current;
 
   const touchStart = useRef<{x: number; y: number}>({x: 0, y: 0});
-  const longPressActivated = useRef(false); // <-- Add this
+  const longPressActivated = useRef(false);
 
   const onViewableItemsChanged = useRef(({viewableItems}: any) => {
     if (viewableItems.length > 0) {
@@ -64,7 +64,7 @@ const ImageSlider = ({
     };
 
   const handleTouchStartPosition =
-    (index: number) => (evt: GestureResponderEvent) => {
+    (_index: number) => (evt: GestureResponderEvent) => {
       const {pageX, pageY} = evt.nativeEvent;
       touchStart.current = {x: pageX, y: pageY};
     };
@@ -77,10 +77,12 @@ const ImageSlider = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         pagingEnabled
+        initialNumToRender={images.length}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         renderItem={({item, index}) => (
           <Pressable
+            testID="slider-image-pressable"
             onPressIn={handleTouchStart(index)}
             onTouchStart={handleTouchStartPosition(index)}
             onPressOut={handleTouchEnd(index, item.url)}
@@ -89,6 +91,7 @@ const ImageSlider = ({
               onImageLongPress?.(item.url);
             }}>
             <Animated.Image
+              testID="slider-image"
               source={{uri: item.url}}
               style={[
                 styles.image,
@@ -103,6 +106,7 @@ const ImageSlider = ({
         {images.map((_, index) => (
           <View
             key={index}
+            testID="pagination-dot"
             style={[
               styles.dot,
               activeIndex === index ? styles.activeDot : undefined,

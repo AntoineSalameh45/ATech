@@ -8,7 +8,7 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
@@ -131,6 +131,14 @@ const HomeScreen = () => {
     }
     return products;
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoading(true);
+      setPage(1);
+      loadProducts(1, searchQuery);
+    }, [loadProducts, searchQuery])
+  );
 
   return (
     <KeyboardAvoidingView

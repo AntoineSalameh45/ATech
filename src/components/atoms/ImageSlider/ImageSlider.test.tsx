@@ -19,29 +19,25 @@ describe('ImageSlider', () => {
     expect(getAllByTestId('pagination-dot').length).toBe(images.length);
   });
 
-  it(
-    'calls onImagePress when image is tapped',
-    async () => {
-      const onImagePress = jest.fn();
-      const {getAllByTestId} = render(
-        <ImageSlider images={images} onImagePress={onImagePress} />,
-      );
-      const imagePressable = getAllByTestId('slider-image-pressable')[0];
-      act(() => {
-        fireEvent(imagePressable, 'onPressIn');
-        fireEvent(imagePressable, 'onTouchStart', {
-          nativeEvent: {pageX: 0, pageY: 0},
-        });
-        fireEvent(imagePressable, 'onPressOut', {
-          nativeEvent: {pageX: 0, pageY: 0},
-        });
+  it('calls onImagePress when image is tapped', async () => {
+    const onImagePress = jest.fn();
+    const {getAllByTestId} = render(
+      <ImageSlider images={images} onImagePress={onImagePress} />,
+    );
+    const imagePressable = getAllByTestId('slider-image-pressable')[0];
+    act(() => {
+      fireEvent(imagePressable, 'onPressIn');
+      fireEvent(imagePressable, 'onTouchStart', {
+        nativeEvent: {pageX: 0, pageY: 0},
       });
-      await waitFor(() => {
-        expect(onImagePress).toHaveBeenCalledWith(images[0].url);
+      fireEvent(imagePressable, 'onPressOut', {
+        nativeEvent: {pageX: 0, pageY: 0},
       });
-    },
-    10000
-  );
+    });
+    await waitFor(() => {
+      expect(onImagePress).toHaveBeenCalledWith(images[0].url);
+    });
+  }, 10000);
 
   it('calls onImageLongPress when image is long pressed', () => {
     const onImageLongPress = jest.fn();

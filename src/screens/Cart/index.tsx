@@ -13,6 +13,7 @@ import {useTheme} from '../../stores/ThemeContext';
 import {getDynamicStyles} from './styles';
 import useCartStore from '../../stores/CartStore';
 import {DeleteIcon} from '../../assets/svg';
+import { onesignalNotifications } from '../../services/onesignalNotifications';
 
 const CartScreen = () => {
   const {theme} = useTheme();
@@ -25,6 +26,10 @@ const CartScreen = () => {
       (total, item) => total + item.price * item.quantity,
       0,
     );
+  };
+
+  const onCheckout = () => {
+    onesignalNotifications();
   };
 
   const RightAction = ({progress}: {progress: SharedValue<number>}) => {
@@ -85,7 +90,7 @@ const CartScreen = () => {
 
         {cartItems.length > 0 && (
           <View style={{marginBottom: 20}}>
-            <TouchableOpacity style={styles.checkoutButton}>
+            <TouchableOpacity style={styles.checkoutButton} onPress={onCheckout}>
               <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
             </TouchableOpacity>
             <TouchableOpacity

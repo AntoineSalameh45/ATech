@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,11 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import {RouteProp, useNavigation} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {RootStackParamList} from '../../navigation/stacks/RootStackParamList';
 import {getDynamicStyles} from './styles';
 import {useTheme} from '../../stores/ThemeContext';
@@ -27,6 +31,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import api from '../../services/api';
 import notifee from '@notifee/react-native';
 import {CloseCircleIcon} from '../../assets/svg';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 const fetchCurrentUser = async () => {
   try {
@@ -46,6 +51,23 @@ type Props = {
 };
 
 const Details = ({route}: Props) => {
+  const [product, setProduct] = useState<any>(route.params);
+
+  const fetchProductDetails = useCallback(async () => {
+    try {
+      const response = await api.get(`/api/products/${route.params._id}`);
+      setProduct(response.data.data);
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  }, [route.params._id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProductDetails();
+    }, [fetchProductDetails]),
+  );
+
   const {
     title,
     description,
@@ -56,11 +78,11 @@ const Details = ({route}: Props) => {
     _id,
     user: productOwner,
     locationName,
-  } = route.params;
+  } = product || {};
   const {theme} = useTheme();
   const styles = getDynamicStyles(theme);
   const {addItem} = useCartStore();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -79,11 +101,12 @@ const Details = ({route}: Props) => {
     getCurrentUser();
   }, []);
 
-  const formattedImages = (images && images.length > 0)
-  ? images.map((img: { url: string }) => ({
-      url: img.url.startsWith('http') ? img.url : `${BASE_URL}${img.url}`,
-    }))
-  : [];
+  const formattedImages =
+    images && images.length > 0
+      ? images.map((img: {url: string}) => ({
+          url: img.url.startsWith('http') ? img.url : `${BASE_URL}${img.url}`,
+        }))
+      : [];
 
   const handleAddToCart = () => {
     addItem({
@@ -107,7 +130,7 @@ const Details = ({route}: Props) => {
           style: 'cancel',
         },
       ],
-      { cancelable: true }
+      {cancelable: true},
     );
   };
 

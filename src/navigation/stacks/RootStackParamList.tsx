@@ -12,7 +12,7 @@ export type RootStackParamList = {
     images: {url: string}[];
     latitude: number;
     longitude: number;
-    user: {email: string, id: string};
+    user: {email: string; id: string};
     locationName: string;
   };
   EditProduct: {
@@ -20,7 +20,7 @@ export type RootStackParamList = {
     title: string;
     description: string;
     price: number;
-    images: { url: string }[];
+    images: {url: string}[];
     latitude: number;
     longitude: number;
     locationName: string;
@@ -29,4 +29,31 @@ export type RootStackParamList = {
     name: string;
   };
   Cart: undefined;
+  CrashTestScreen: undefined;
+  HomePage: {
+    Home: undefined;
+    ProductScreen: {
+      Details: {
+        _id: string;
+        title: string;
+        description: string;
+        price: number;
+        images: {url: string}[];
+        latitude: number;
+        longitude: number;
+        user: {email: string; id: string};
+        locationName: string;
+      };
+      EditProduct: {
+        productId: string;
+        title: string;
+        description: string;
+        price: number;
+        images: {url: string}[];
+        latitude: number;
+        longitude: number;
+        locationName: string;
+      };
+    };
+  };
 };

@@ -5,6 +5,8 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
 import RootStack from './src/navigation/RootStack';
 import BootSplash from 'react-native-bootsplash';
+import {OneSignal, LogLevel} from 'react-native-onesignal';
+import { ONE_SIGNAL_APPID } from '@env';
 
 const linking = {
   prefixes: ['atech://'],
@@ -28,6 +30,11 @@ const linking = {
 
 const App = () => {
   useEffect(() => {
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+    OneSignal.initialize(ONE_SIGNAL_APPID);
+
+    OneSignal.Notifications.requestPermission(false);
+
     BootSplash.hide({fade: true}).then(() => {});
   }, []);
 

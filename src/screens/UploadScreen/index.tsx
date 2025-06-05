@@ -23,6 +23,7 @@ import {ProductForm} from '../../components/molecules/ProductForm';
 import {ImagePicker} from '../../components/molecules/ImagePicker';
 import {MapModal} from '../../components/molecules/MapModal';
 import {useNavigation} from '@react-navigation/native';
+import { onesignalNotifications } from '../../services/onesignalNotifications';
 
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
@@ -177,34 +178,35 @@ const UploadProductScreen = () => {
         Alert.alert('Success', 'Product uploaded successfully!');
 
         setImages([]);
-        await notifee.requestPermission();
-        const channelId = await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-          vibration: true,
-          sound: 'lightsaber',
-        });
+        
+        // await notifee.requestPermission();
+        // const channelId = await notifee.createChannel({
+        //   id: 'default',
+        //   name: 'Default Channel',
+        //   vibration: true,
+        //   sound: 'lightsaber',
+        // });
+        //const productId = response.data.data._id;
+        // await notifee.displayNotification({
+        //   title: 'Product posted',
+        //   body: 'Your product has been uploaded successfully',
+        //   android: {
+        // channelId,
+        // pressAction: {
+        //   id: 'default',
+        //   launchActivity: 'default',
+        // },
+        // smallIcon: 'ic_small_icon',
+        // color: '#87CEEB',
+        // largeIcon: require('../../assets/profile-placeholder.png'),
+        // sound: 'lightsaber',
+        //   },
+        //   data: {
+        // productId: String(productId),
+        //   },
+        // });
 
-        const productId = response.data.data._id;
-
-        await notifee.displayNotification({
-          title: 'Product posted',
-          body: 'Your product has been uploaded successfully',
-          android: {
-        channelId,
-        pressAction: {
-          id: 'default',
-          launchActivity: 'default',
-        },
-        smallIcon: 'ic_small_icon',
-        color: '#87CEEB',
-        largeIcon: require('../../assets/profile-placeholder.png'),
-        sound: 'lightsaber',
-          },
-          data: {
-        productId: String(productId),
-          },
-        });
+        onesignalNotifications(); 
         navigation.navigate('HomePage');
       } else {
         throw new Error('Unexpected response format');

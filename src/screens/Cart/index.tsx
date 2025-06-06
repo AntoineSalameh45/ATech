@@ -28,10 +28,6 @@ const CartScreen = () => {
     );
   };
 
-  const onCheckout = () => {
-    onesignalNotifications();
-  };
-
   const RightAction = ({progress}: {progress: SharedValue<number>}) => {
     const animatedStyle = useAnimatedStyle(() => {
       const opacity = progress.value;
@@ -90,7 +86,7 @@ const CartScreen = () => {
 
         {cartItems.length > 0 && (
           <View style={{marginBottom: 20}}>
-            <TouchableOpacity style={styles.checkoutButton} onPress={onCheckout}>
+            <TouchableOpacity style={styles.checkoutButton}>
               <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
             </TouchableOpacity>
             <TouchableOpacity

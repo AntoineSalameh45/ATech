@@ -30,7 +30,16 @@ bundle install
 bundle exec pod install --project-directory=ios
 ```
 
-### Step 2: Start Metro
+### Step 2: Set Up Environment
+
+The project has three environments: `development`, `staging`, and `production`. Set the desired environment using the following command:
+
+```sh
+# Replace "your_env" with development, staging, or production
+export ENVFILE=.env.your_env
+```
+
+### Step 3: Start Metro
 
 Start the Metro bundler, the JavaScript build tool for React Native:
 
@@ -42,16 +51,21 @@ npm start
 yarn start
 ```
 
-### Step 3: Run the App
+### Step 4: Run the App
 
 #### Android
 
-```sh
-# Using npm
-npm run android
+To run the app on an Android device or emulator, use the following commands:
 
-# OR using Yarn
-yarn android
+```sh
+# For development environment
+cd android && ./gradlew installDevDebug && cd ..
+
+# For staging environment
+cd android && ./gradlew installStagingDebug && cd ..
+
+# For production environment
+cd android && ./gradlew installProdRelease && cd ..
 ```
 
 #### iOS
@@ -63,7 +77,6 @@ npm run ios
 # OR using Yarn
 yarn ios
 ```
-
 
 ## Fonts
 
